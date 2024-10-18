@@ -1,0 +1,40 @@
+ECHO is on.
+# Compiled class files
+*.class
+
+# Log files
+*.log
+/logs/
+
+# Maven specific files
+target/
+*.jar
+*.war
+*.ear
+
+# Eclipse specific files
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA specific files
+.idea/
+*.iml
+*.iws
+out/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment variables
+.env
+
+# Other generated files
+/target/
+/bin/
+/*.swp
