@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.Jacob.ridesafebackend.models.Driver;
 
 @Repository
-public interface DriverRepository extends CrudRepository<Driver,Long> {
+public interface DriverRepository extends CrudRepository<Driver,String> {
 	List<Driver> findAll();
 }
 //Imported CRud for driver repository. 
