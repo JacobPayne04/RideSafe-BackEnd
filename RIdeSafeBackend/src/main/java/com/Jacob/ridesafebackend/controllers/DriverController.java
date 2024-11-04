@@ -1,8 +1,8 @@
 package com.Jacob.ridesafebackend.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -23,14 +23,15 @@ public class DriverController {
 		this.driverServ = driverServ;
 	}
 	
-	
+	@CrossOrigin(origins = "http://localhost:3000")
 	@PostMapping("/new")
 	public ResponseEntity<Driver> createDriver(@RequestBody Driver driver,HttpSession session){
-		if(session.getAttribute("user_id") == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
 		
 		Driver creatDriver = driverServ.creatDriver(driver);
+		
+		session.setAttribute("driver_id", creatDriver.getId());
+		
+	
 		
 		return ResponseEntity.ok(creatDriver);
 	}
