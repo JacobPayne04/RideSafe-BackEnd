@@ -1,5 +1,7 @@
 package com.Jacob.ridesafebackend.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.models.Driver;
@@ -19,6 +21,9 @@ public class DriverService {
 		return driverRepo.save(driver);
 	}
 	
+	public List<Driver> getAllDrivers(){
+		return driverRepo.findAll();
+	}
 	
 	
 	
