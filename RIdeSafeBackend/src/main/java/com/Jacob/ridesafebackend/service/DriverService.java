@@ -1,6 +1,7 @@
 package com.Jacob.ridesafebackend.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,10 @@ public class DriverService {
 	
 	public List<Driver> getAllDrivers(){
 		return driverRepo.findAll();
+	}
+	//added get driver by id route
+	public Optional<Driver> getDriverById(String id){
+		return driverRepo.findById(id);
 	}
 	
 	

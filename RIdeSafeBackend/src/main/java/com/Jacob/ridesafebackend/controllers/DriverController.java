@@ -2,6 +2,7 @@ package com.Jacob.ridesafebackend.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +36,31 @@ public class DriverController {
 		
 		session.setAttribute("driver_id", creatDriver.getId());
 		
-	
-		
 		return ResponseEntity.ok(creatDriver);
 	}
+	
+	
+	
+	
+	
+	//TODO incomplete fetching driver by id in session 
+	@PostMapping("/new/process")
+	public ResponseEntity<?> processDriver(HttpSession session){
+		
+		String driverId  = (String) session.getAttribute("driver_id");
+		
+		if(driverId == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Driver not logged in, Please sing up to be a driver");
+		}
+		
+		//Driver oneDriver = driverServ.getDriverById(driverId);
+	
+		return ResponseEntity.ok(oneDriver);
+	}
+	
+	
+	
+	
 	
 	
 	@GetMapping("/drivers") // Fixed the get All Drivers Route
