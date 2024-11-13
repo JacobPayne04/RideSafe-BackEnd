@@ -1,11 +1,13 @@
 package com.Jacob.ridesafebackend.controllers;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,6 +71,18 @@ public class DriverController {
 		return ResponseEntity.ok(drivers);
 	}
 	
+	// Getting One Driver
+	@GetMapping("/driver/{id}")
+    public ResponseEntity<?> getDriverById(@PathVariable("id") String id) {	// Pass in the drivers Id to send to the frontend
+		
+        Optional<Driver> driver = driverServ.getDriverById(id); // fetching a driver by its id
+
+        if (driver.isEmpty()) {	// if the driver does not exist, return "Driver not found."
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Driver not found.");
+        }
+
+        return ResponseEntity.ok(driver.get()); // return the Driver 
+    }
 	
 	
 	
