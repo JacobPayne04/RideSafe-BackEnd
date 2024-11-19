@@ -3,6 +3,7 @@ package com.Jacob.ridesafebackend.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.models.Driver;
@@ -19,6 +20,8 @@ public class DriverService {
 	}
 	
 	public Driver creatDriver(Driver driver) {
+		String hashed = BCrypt.hashpw(driver.getPassword(), BCrypt.gensalt());
+		driver.setPassword(hashed);
 		return driverRepo.save(driver);
 	}
 	

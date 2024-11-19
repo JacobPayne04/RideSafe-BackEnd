@@ -42,30 +42,8 @@ public class DriverController {
 	}
 	
 	
-	
-	
-	
-	//TODO incomplete fetching driver by id in session 
-	@PostMapping("/new/process")
-	public ResponseEntity<?> processDriver(HttpSession session){
-		
-		String driverId  = (String) session.getAttribute("driver_id");
-		
-		if(driverId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Driver not logged in, Please sing up to be a driver");
-		}
-		
-		//Driver oneDriver = driverServ.getDriverById(driverId);
-	
-		return ResponseEntity.ok(oneDriver);
-	}
-	
-	
-	
-	
-	
-	
-	@GetMapping("/drivers") // Fixed the get All Drivers Route
+	//Current Driver in session route
+	@GetMapping("/drivers") 
 	public ResponseEntity<List<Driver>> getAllDrivers(){	
 		List<Driver> drivers = driverServ.getAllDrivers();
 		return ResponseEntity.ok(drivers);
