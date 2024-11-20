@@ -39,7 +39,7 @@ public class DriverController {
 		
 		Driver creatDriver = driverServ.creatDriver(driver);
 		
-		session.setAttribute("driver_id", creatDriver.getId());
+		
 		
 		return ResponseEntity.ok(creatDriver);
 	}
@@ -67,9 +67,10 @@ public class DriverController {
 	
 	
 	   @PostMapping("/login")
-	    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDriver loginDriver) {
+	    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDriver loginDriver,HttpSession session) {
 	        // Fetch the driver by email
 	        Driver existingDriver = driverServ.getDriver(loginDriver.getEmail());
+	        
 	        if (existingDriver == null) {
 	            return ResponseEntity
 	                    .status(HttpStatus.BAD_REQUEST)
@@ -82,9 +83,10 @@ public class DriverController {
 	                    .status(HttpStatus.BAD_REQUEST)
 	                    .body(Map.of("message", "Incorrect password"));
 	        }
-
+	   
 	        // Login successful
-	        return ResponseEntity.ok(Map.of("message", "Login successful"));
+	        return ResponseEntity.ok(Map.of("message", "Login successful","id",existingDriver.getId()));
+	      
 	    }
 	
 	
