@@ -1,7 +1,5 @@
 package com.Jacob.ridesafebackend.models;
 
-import java.util.List;
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.persistence.Id;
@@ -42,8 +40,7 @@ public class Driver {
 	private String licensePlate;
 	
 	
-	private List<String> driverIds;
-	
+
 	//What we call in the routes
 	public Driver() {}
 
@@ -103,13 +100,7 @@ public class Driver {
 		this.licensePlate = licensePlate;
 	}
 
-	public List<String> getDriverIds() {
-		return driverIds;
-	}
-
-	public void setDriverIds(List<String> driverIds) {
-		this.driverIds = driverIds;
-	}
+	
 	
 	}
 //Driver model
