@@ -33,6 +33,18 @@ public class DriverService {
 		return driverRepo.findById(id);
 	}
 	
-	
-	
+
+	 // Retrieve a driver by email
+    public Driver getDriver(String email) {
+        return driverRepo.findByEmail(email);
+    }
+
+    // Authenticate a driver by verifying their password
+    public boolean authenticateDriver(String rawPassword, String hashedPassword) {
+        return BCrypt.checkpw(rawPassword, hashedPassword);
+    }
+    
+    
+    
 }
+

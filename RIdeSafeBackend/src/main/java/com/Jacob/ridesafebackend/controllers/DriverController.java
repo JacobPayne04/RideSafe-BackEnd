@@ -1,7 +1,9 @@
 package com.Jacob.ridesafebackend.controllers;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Driver;
+import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.service.DriverService;
 
 import jakarta.servlet.http.HttpSession;
@@ -63,9 +66,26 @@ public class DriverController {
     }
 	
 	
-	
-	
-	
+	   @PostMapping("/login")
+	    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDriver loginDriver) {
+	        // Fetch the driver by email
+	        Driver existingDriver = driverServ.getDriver(loginDriver.getEmail());
+	        if (existingDriver == null) {
+	            return ResponseEntity
+	                    .status(HttpStatus.BAD_REQUEST)
+	                    .body(Map.of("message", "Unknown email"));
+	        }
+
+	        // Check the password using BCrypt
+	        if (!BCrypt.checkpw(loginDriver.getPassword(), existingDriver.getPassword())) {
+	            return ResponseEntity
+	                    .status(HttpStatus.BAD_REQUEST)
+	                    .body(Map.of("message", "Incorrect password"));
+	        }
+
+	        // Login successful
+	        return ResponseEntity.ok(Map.of("message", "Login successful"));
+	    }
 	
 	
 	
