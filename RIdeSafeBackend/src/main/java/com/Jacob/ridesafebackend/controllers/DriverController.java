@@ -1,7 +1,9 @@
 package com.Jacob.ridesafebackend.controllers;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Driver;
+import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.service.DriverService;
 
 import jakarta.servlet.http.HttpSession;
@@ -42,30 +45,8 @@ public class DriverController {
 	}
 	
 	
-	
-	
-	
-	//TODO incomplete fetching driver by id in session 
-	@PostMapping("/new/process")
-	public ResponseEntity<?> processDriver(HttpSession session){
-		
-		String driverId  = (String) session.getAttribute("driver_id");
-		
-		if(driverId == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Driver not logged in, Please sing up to be a driver");
-		}
-		
-		//Driver oneDriver = driverServ.getDriverById(driverId);
-	
-		return ResponseEntity.ok(oneDriver);
-	}
-	
-	
-	
-	
-	
-	
-	@GetMapping("/drivers") // Fixed the get All Drivers Route
+	//Current Driver in session route
+	@GetMapping("/drivers") 
 	public ResponseEntity<List<Driver>> getAllDrivers(){	
 		List<Driver> drivers = driverServ.getAllDrivers();
 		return ResponseEntity.ok(drivers);
@@ -85,9 +66,26 @@ public class DriverController {
     }
 	
 	
-	
-	
-	
+	   @PostMapping("/login")
+	    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDriver loginDriver) {
+	        // Fetch the driver by email
+	        Driver existingDriver = driverServ.getDriver(loginDriver.getEmail());
+	        if (existingDriver == null) {
+	            return ResponseEntity
+	                    .status(HttpStatus.BAD_REQUEST)
+	                    .body(Map.of("message", "Unknown email"));
+	        }
+
+	        // Check the password using BCrypt
+	        if (!BCrypt.checkpw(loginDriver.getPassword(), existingDriver.getPassword())) {
+	            return ResponseEntity
+	                    .status(HttpStatus.BAD_REQUEST)
+	                    .body(Map.of("message", "Incorrect password"));
+	        }
+
+	        // Login successful
+	        return ResponseEntity.ok(Map.of("message", "Login successful"));
+	    }
 	
 	
 	

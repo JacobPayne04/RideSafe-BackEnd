@@ -10,6 +10,8 @@ import com.Jacob.ridesafebackend.models.Driver;
 @Repository
 public interface DriverRepository extends CrudRepository<Driver,String> {
 	List<Driver> findAll();
+
+	Driver findByEmail(String email);
 }
 //Imported CRud for driver repository. 
 
