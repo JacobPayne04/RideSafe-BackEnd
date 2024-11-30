@@ -14,6 +14,8 @@ public class Driver {
 	@Id
 	private String id;
 	
+	private boolean isOnline;
+	
 	@NotEmpty(message = "First name is required!")
 	@Size(min = 3,max = 15,message = "First name must be between 3 and 15 characters")
 	private String firstName;
@@ -98,6 +100,14 @@ public class Driver {
 
 	public void setLicensePlate(String licensePlate) {
 		this.licensePlate = licensePlate;
+	}
+
+	public boolean isOnline() {
+		return isOnline;
+	}
+
+	public void setOnline(boolean isOnline) {
+		this.isOnline = isOnline;
 	}
 
 	
