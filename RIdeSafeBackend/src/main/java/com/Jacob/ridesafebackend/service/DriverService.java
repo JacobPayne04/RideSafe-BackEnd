@@ -47,7 +47,7 @@ public class DriverService {
     public void updateStatus(String id, boolean isOnline) {
     	Driver driver = driverRepo.findById(id).
     			orElseThrow(()-> new RuntimeException("Driver not found"));
-    	driver.setOnline(isOnline);
+    	driver.setIsOnline(isOnline);
     	driverRepo.save(driver);
     }
 
