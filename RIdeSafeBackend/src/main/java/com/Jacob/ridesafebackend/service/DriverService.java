@@ -44,6 +44,14 @@ public class DriverService {
         return BCrypt.checkpw(rawPassword, hashedPassword);
     }
     
+    public void updateStatus(String id, boolean isOnline) {
+    	Driver driver = driverRepo.findById(id).
+    			orElseThrow(()-> new RuntimeException("Driver not found"));
+    	driver.setOnline(isOnline);
+    	driverRepo.save(driver);
+    }
+
+	
     
     
 }
