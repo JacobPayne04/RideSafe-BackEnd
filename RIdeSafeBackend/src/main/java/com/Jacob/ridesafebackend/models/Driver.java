@@ -106,9 +106,9 @@ public class Driver {
 		return isOnline;
 	}
 
-	public void setOnline(boolean isOnline) {
-		this.isOnline = isOnline;
-	}
+	public void setIsOnline(boolean isOnline) { // This method should be setIsOnline, not setOnline
+        this.isOnline = isOnline;
+    }
 
 	
 	
