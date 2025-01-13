@@ -6,17 +6,21 @@ import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import com.Jacob.ridesafebackend.dto.DriverProjection;
 import com.Jacob.ridesafebackend.models.Driver;
+import com.Jacob.ridesafebackend.repositorys.DriverMongoRepository;
 import com.Jacob.ridesafebackend.repositorys.DriverRepository;
 
 @Service
 public class DriverService {
 	//Connects server to repository
 	private final DriverRepository driverRepo; //#TODO create getters and setters !*
+	private final DriverMongoRepository driverMongoRepo;
 
 	//stating driverRepo refers to driver repository
-	public DriverService(DriverRepository driverRepo) {
+	public DriverService(DriverRepository driverRepo,DriverMongoRepository driverMongoRepo) {
 		this.driverRepo = driverRepo;
+		this.driverMongoRepo = driverMongoRepo;
 	}
 	
 	public Driver creatDriver(Driver driver) {
@@ -50,6 +54,12 @@ public class DriverService {
     	driver.setOnline(isOnline);
     	driverRepo.save(driver);
     }
+
+	public List<Driver> getIsOnlineDrivers() {
+		return driverMongoRepo.findByIsOnlineTrue();
+	}
+
+	
 
 	
     
