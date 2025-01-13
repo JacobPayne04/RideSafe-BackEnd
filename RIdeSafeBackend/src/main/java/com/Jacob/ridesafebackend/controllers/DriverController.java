@@ -2,6 +2,8 @@ package com.Jacob.ridesafebackend.controllers;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Jacob.ridesafebackend.dto.DriverProjection;
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.service.DriverService;
@@ -30,7 +33,7 @@ public class DriverController {
 	//TODO need to make driver service
 	@Autowired
 	private final DriverService driverServ;
-	
+
 	public DriverController(DriverService driverServ) {
 		this.driverServ = driverServ;
 	}
@@ -105,6 +108,21 @@ public class DriverController {
 		   return ResponseEntity.ok("Drive Status updated");
 	   }
 	
+	   
+	   @GetMapping("/online/drivers")
+	   public ResponseEntity<List<Driver>>GetIsOnlineDrivers(){
+		   List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
+		   return ResponseEntity.ok(onlineDrivers);
+		  
+	   }
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
 	
 	
 	
