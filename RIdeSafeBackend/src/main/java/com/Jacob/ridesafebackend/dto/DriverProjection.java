@@ -1,5 +1,7 @@
 package com.Jacob.ridesafebackend.dto;
 
-public class DriverProjection {
-
+public interface DriverProjection {
+	String getId();
+	String getFirstName();
+	String getLastName();
 }
