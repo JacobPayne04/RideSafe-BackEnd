@@ -17,7 +17,9 @@ public class DriverService {
 	private final DriverMongoRepository driverMongoRepo;
 
 	//stating driverRepo refers to driver repository
-	public DriverService(DriverRepository driverRepo, DriverMongoRepository driverMongoRepo) {
+
+	public DriverService(DriverRepository driverRepo,DriverMongoRepository driverMongoRepo) {
+
 		this.driverRepo = driverRepo;
 		this.driverMongoRepo = driverMongoRepo;
 	}
@@ -53,6 +55,7 @@ public class DriverService {
     	driver.setIsOnline(isOnline);
     	driverRepo.save(driver);
     }
+
 
 	public List<Driver> getIsOnlineDrivers(){
 		return driverMongoRepo.findByIsOnlineTrue();

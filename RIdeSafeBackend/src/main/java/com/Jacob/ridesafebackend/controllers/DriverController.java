@@ -2,7 +2,6 @@ package com.Jacob.ridesafebackend.controllers;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +29,7 @@ public class DriverController {
 	//TODO need to make driver service
 	@Autowired
 	private final DriverService driverServ;
-	
+
 	public DriverController(DriverService driverServ) {
 		this.driverServ = driverServ;
 	}
@@ -98,7 +97,22 @@ public class DriverController {
 		   driverServ.updateStatus(id,isOnline);
 		   return ResponseEntity.ok("Drive Status updated");
 	   }
-	
+	   
+	   
+	   @GetMapping("/online/drivers")
+	   public ResponseEntity<List<Driver>>GetIsOnlineDrivers(){
+		   List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
+		   return ResponseEntity.ok(onlineDrivers);
+		  
+	   }
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+	   
 	
 	   @GetMapping("/online/drivers")
 	   public ResponseEntity<List<Driver>> GetOnlineDrivers(){

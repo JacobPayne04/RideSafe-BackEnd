@@ -10,6 +10,8 @@ import com.Jacob.ridesafebackend.models.Driver;
 @Repository
 public interface DriverMongoRepository extends MongoRepository<Driver, String> {
 
+
 	List<Driver> findByIsOnlineTrue();
+
 
 }
