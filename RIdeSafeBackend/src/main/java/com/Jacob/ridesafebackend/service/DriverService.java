@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
-import com.Jacob.ridesafebackend.dto.DriverProjection;
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.repositorys.DriverMongoRepository;
 import com.Jacob.ridesafebackend.repositorys.DriverRepository;
