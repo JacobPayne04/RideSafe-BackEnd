@@ -90,14 +90,8 @@ public class DriverController {
 	        return ResponseEntity.ok(Map.of("message", "Login successful","id",existingDriver.getId()));
 	      
 	    }
-	
-	   
-	   
-	   
 	   
 	   //ROUTES FOR DRIVER FUNCTIONALITY*******************************************************************************************
-	   
-	   
 	   
 	   @PutMapping("/{id}/status")
 	   public ResponseEntity<String> updateDriverStatus(@PathVariable("id") String id,@RequestParam boolean isOnline){
@@ -106,7 +100,12 @@ public class DriverController {
 	   }
 	
 	
-	
+	   @GetMapping("/online/drivers")
+	   public ResponseEntity<List<Driver>> GetOnlineDrivers(){
+		   List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
+		   return ResponseEntity.ok(onlineDrivers);
+		   
+	   }
 	
 	
 
