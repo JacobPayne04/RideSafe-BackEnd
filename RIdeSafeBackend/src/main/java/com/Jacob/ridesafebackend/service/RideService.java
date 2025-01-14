@@ -2,6 +2,7 @@ package com.Jacob.ridesafebackend.service;
 
 import org.springframework.stereotype.Service;
 
+import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
 
 @Service
@@ -14,5 +15,7 @@ public class RideService {
 				this.rideRepo = rideRepo;
 			}
 
-			
+			public Ride saveRide(Ride ride) {
+				return rideRepo.save(ride);
+			}
 }
