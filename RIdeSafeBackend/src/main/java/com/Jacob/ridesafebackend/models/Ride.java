@@ -14,9 +14,18 @@ public class Ride {
 	
 	private String fromLocation;
 	private String toLocation;
+	private String status;
 	
-	private RideStatus status;
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
 	
+	public String getStatus() {
+		return status;
+	}
+
 	private LocalDateTime createdAt;
 	
 	
@@ -53,13 +62,7 @@ public class Ride {
 		this.toLocation = toLocation;
 	}
 
-	public RideStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(RideStatus status) {
-		this.status = status;
-	}
+	
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
