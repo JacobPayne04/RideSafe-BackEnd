@@ -9,6 +9,9 @@ import com.Jacob.ridesafebackend.models.Driver;
 
 @Repository
 public interface DriverMongoRepository extends MongoRepository<Driver, String> {
-	  // MongoDB-specific query with projection
-    List<Driver> findByIsOnlineTrue();
+
+
+	List<Driver> findByIsOnlineTrue();
+
+
 }

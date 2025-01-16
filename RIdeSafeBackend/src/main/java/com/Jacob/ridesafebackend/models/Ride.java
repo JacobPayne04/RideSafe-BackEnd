@@ -4,18 +4,29 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 @Document(collection = "Ride")
 public class Ride {
 	@Id
     private String id;
 	
 	private String passengerId;
-	private String DriverId;
+	private String driverId;
 	
 	private String fromLocation;
 	private String toLocation;
 	
-	private RideStatus status;
+    @Enumerated(EnumType.STRING)
+    private RideStatus status;
+
+    public enum RideStatus {
+        PENDING,
+        COMPLETED,
+        CANCELED
+    }
+
 	
 	private LocalDateTime createdAt;
 	
@@ -29,12 +40,13 @@ public class Ride {
 		this.passengerId = passengerId;
 	}
 
+	
 	public String getDriverId() {
-		return DriverId;
+		return driverId;
 	}
 
 	public void setDriverId(String driverId) {
-		DriverId = driverId;
+		this.driverId = driverId;
 	}
 
 	public String getFromLocation() {
