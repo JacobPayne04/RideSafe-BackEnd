@@ -105,22 +105,6 @@ public class DriverController {
 		   return ResponseEntity.ok(onlineDrivers);
 		  
 	   }
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	   
-	
-	   @GetMapping("/online/drivers")
-	   public ResponseEntity<List<Driver>> GetOnlineDrivers(){
-		   List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
-		   return ResponseEntity.ok(onlineDrivers);
-		   
-	   }
-	
 	
 
 }

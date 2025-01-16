@@ -56,7 +56,6 @@ public class DriverService {
     	driverRepo.save(driver);
     }
 
-
 	public List<Driver> getIsOnlineDrivers(){
 		return driverMongoRepo.findByIsOnlineTrue();
 	}
