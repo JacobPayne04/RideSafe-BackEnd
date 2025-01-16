@@ -17,7 +17,7 @@ public class Ride {
 	
 	private String fromLocation;
 	private String toLocation;
-	
+
     @Enumerated(EnumType.STRING)
     private RideStatus status;
 
@@ -27,7 +27,6 @@ public class Ride {
         CANCELED
     }
 
-	
 	private LocalDateTime createdAt;
 	
 	
@@ -65,13 +64,7 @@ public class Ride {
 		this.toLocation = toLocation;
 	}
 
-	public RideStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(RideStatus status) {
-		this.status = status;
-	}
+	
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
