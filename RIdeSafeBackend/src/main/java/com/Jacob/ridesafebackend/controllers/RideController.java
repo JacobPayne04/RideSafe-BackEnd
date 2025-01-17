@@ -1,5 +1,7 @@
 package com.Jacob.ridesafebackend.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,23 +33,28 @@ public class RideController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    // Save a ride
     @PostMapping("/rides/save")
     public ResponseEntity<String> saveRide(@RequestBody Ride ride) {
         Ride savedRide = rideServ.saveRide(ride); // Using rideServ consistently
         System.out.println("Notification sent to /topic/driver/" + savedRide.getDriverId());
         
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("message", "New ride request from passenger.");
+        notification.put("passengerId", savedRide.getPassengerId());
+        notification.put("rideId", savedRide.getId());
+        notification.put("fromLocation", savedRide.getFromLocation());
+        notification.put("toLocation", savedRide.getToLocation());
+
         messagingTemplate.convertAndSend(
                 "/topic/driver/" + savedRide.getDriverId(),
-                "New ride request from passenger " + savedRide.getPassengerId()
-                + ". Please Accept or Deny. Ride ID: " + savedRide.getId()
-            );
+                notification
+        );
+        
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Ride scheduled successfully with ID: " + savedRide.getId());
         
     }
-	
 	//Get ride by Id
     @GetMapping("/ride/{id}")
     public ResponseEntity<Ride> getRideById(@PathVariable String id) {
