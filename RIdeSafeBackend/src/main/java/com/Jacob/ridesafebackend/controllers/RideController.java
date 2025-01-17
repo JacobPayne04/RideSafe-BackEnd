@@ -35,6 +35,7 @@ public class RideController {
     @PostMapping("/rides/save")
     public ResponseEntity<String> saveRide(@RequestBody Ride ride) {
         Ride savedRide = rideServ.saveRide(ride); // Using rideServ consistently
+        System.out.println("Notification sent to /topic/driver/" + savedRide.getDriverId());
         
         messagingTemplate.convertAndSend(
                 "/topic/driver/" + savedRide.getDriverId(),
