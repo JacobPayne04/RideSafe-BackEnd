@@ -19,3 +19,4 @@ public class RideService {
 				return rideRepo.save(ride);
 			}
 }
+

@@ -30,6 +30,13 @@ public class Ride {
 	private LocalDateTime createdAt;
 	
 	
+	public RideStatus getStatus() {
+		return status;
+	}
+	
+	public void setRideStatus(RideStatus status) {
+		this.status = status;
+	}
 	
 	public String getPassengerId() {
 		return passengerId;
