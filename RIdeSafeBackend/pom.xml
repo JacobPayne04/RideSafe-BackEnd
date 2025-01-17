@@ -88,7 +88,10 @@
 		<artifactId>jquery</artifactId>
 		<version>3.5.1</version>
 	</dependency>
-		
+		<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-websocket</artifactId>
+</dependency>
 
 	
 	<dependency>
