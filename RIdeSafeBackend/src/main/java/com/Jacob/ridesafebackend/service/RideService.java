@@ -1,7 +1,8 @@
 package com.Jacob.ridesafebackend.service;
 
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 
+import org.springframework.stereotype.Service;
 import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
 
@@ -17,5 +18,9 @@ public class RideService {
 
 			public Ride saveRide(Ride ride) {
 				return rideRepo.save(ride);
+			}
+			
+			public Optional<Ride> getRideById(String id){
+				return rideRepo.findById(id);
 			}
 }
