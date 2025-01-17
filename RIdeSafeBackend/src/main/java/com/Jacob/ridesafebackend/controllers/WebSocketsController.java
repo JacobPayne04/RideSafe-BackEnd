@@ -19,8 +19,8 @@ public class WebSocketsController {
 	        this.rideRepo = rideRepo;
 	    }
 	    
-	  //check driver id naming convention in case of error***** //for getting driver to accept
-	    @MessageMapping("/ride/request/{driver.Id}")
+	  
+	    @MessageMapping("/ride/request/{driverId}")
 	    public void notifyDriver(@DestinationVariable String driverId,Ride ride) {
 	    	
 	    	  Ride currentRide = rideRepo.findById(ride.getId())
@@ -28,6 +28,12 @@ public class WebSocketsController {
 	   	    
 	   	    //notify Driver
 	   	    messagingTemplate.convertAndSend("/topic/driver/" + driverId,
-	   	    		"newRide request: " + currentRide.getId());
+	   	    		"newRide request. Please Accept or Deny " + currentRide.getId());
 	    }
+	    
+	    
+	    
+	    
+	    
+	    
 }
