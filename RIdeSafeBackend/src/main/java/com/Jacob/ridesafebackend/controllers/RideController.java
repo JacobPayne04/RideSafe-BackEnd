@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,5 +63,25 @@ public class RideController {
         return ride.map(ResponseEntity::ok)
                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+    
+    
+    @PutMapping("/{id}/accept")
+    public ResponseEntity<String> acceptRide(@PathVariable String id) {
+        try {
+            // Convert the String "Ongoing" to RideStatus enum
+            Ride.RideStatus status = Ride.RideStatus.valueOf("ONGOING");
+
+            // Call the service with the converted enum
+            rideServ.updateRideStatus(id, status);
+
+            return ResponseEntity.ok("Ride accepted and updated to Ongoing.");
+        } catch (IllegalArgumentException e) {
+            // This will catch invalid  values
+            return ResponseEntity.badRequest().body("Invalid status value.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found.");
+        }
+    }
+    
 
 }
