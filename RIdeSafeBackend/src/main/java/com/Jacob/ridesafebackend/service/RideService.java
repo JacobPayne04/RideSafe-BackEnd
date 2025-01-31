@@ -1,8 +1,10 @@
 package com.Jacob.ridesafebackend.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
 import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.models.Ride.RideStatus;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
@@ -32,6 +34,10 @@ public class RideService {
 				ride.setRideStatus(status);
 				rideRepo.save(ride);
 			}
+			
+		    public List<Ride> getOngoingRidesByDriverId(String driverId) {
+		        return rideRepo.findByDriverIdAndStatus(driverId, Ride.RideStatus.ONGOING);
+		    }
 				
 }			
 
