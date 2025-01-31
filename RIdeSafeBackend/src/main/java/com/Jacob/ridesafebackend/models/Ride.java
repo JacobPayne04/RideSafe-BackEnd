@@ -24,7 +24,8 @@ public class Ride {
     public enum RideStatus {
         PENDING,
         COMPLETED,
-        CANCELED
+        CANCELED,
+        ONGOING
     }
 
 	private LocalDateTime createdAt;
