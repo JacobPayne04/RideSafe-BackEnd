@@ -1,6 +1,7 @@
 package com.Jacob.ridesafebackend.controllers;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,24 +39,29 @@ public class RideController {
     public ResponseEntity<String> saveRide(@RequestBody Ride ride) {
         Ride savedRide = rideServ.saveRide(ride); // Using rideServ consistently
         System.out.println("Notification sent to /topic/driver/" + savedRide.getDriverId());
-        
+
         Map<String, Object> notification = new HashMap<>();
         notification.put("message", "New ride request from passenger.");
         notification.put("passengerId", savedRide.getPassengerId());
         notification.put("rideId", savedRide.getId());
+        notification.put("status", savedRide.getStatus());
         notification.put("fromLocation", savedRide.getFromLocation());
+        notification.put("fromLatitude", savedRide.getFromLatitude());
+        notification.put("fromLongitude", savedRide.getFromLongitude());
         notification.put("toLocation", savedRide.getToLocation());
+        notification.put("toLatitude", savedRide.getToLatitude());
+        notification.put("toLongitude", savedRide.getToLongitude());
 
         messagingTemplate.convertAndSend(
                 "/topic/driver/" + savedRide.getDriverId(),
                 notification
         );
-        
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("Ride scheduled successfully with ID: " + savedRide.getId());
-        
     }
+
 	//Get ride by Id
     @GetMapping("/ride/{id}")
     public ResponseEntity<Ride> getRideById(@PathVariable String id) {
@@ -82,6 +88,20 @@ public class RideController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found.");
         }
     }
+    
+ // Get ongoing rides for driver by driver ID
+    @GetMapping("/driver/{id}/rides/ongoing")
+    public ResponseEntity<List<Ride>> getOngoingRidesByDriverId(@PathVariable String id) {
+        List<Ride> rides = rideServ.getOngoingRidesByDriverId(id);
+
+        if (rides.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        return ResponseEntity.ok(rides);
+    }
+
+
     
 
 }
