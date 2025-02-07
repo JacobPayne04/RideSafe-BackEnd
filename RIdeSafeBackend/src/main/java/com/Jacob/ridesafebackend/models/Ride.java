@@ -15,8 +15,51 @@ public class Ride {
 	private String passengerId;
 	private String driverId;
 	
-	private String fromLocation;
-	private String toLocation;
+    // From Location (Pickup)
+    private String fromLocation;
+    private double fromLatitude;
+    private double fromLongitude;
+    
+    public double getFromLatitude() {
+		return fromLatitude;
+	}
+
+	public void setFromLatitude(double fromLatitude) {
+		this.fromLatitude = fromLatitude;
+	}
+
+	public double getFromLongitude() {
+		return fromLongitude;
+	}
+
+	public void setFromLongitude(double fromLongitude) {
+		this.fromLongitude = fromLongitude;
+	}
+
+	public double getToLatitude() {
+		return toLatitude;
+	}
+
+	public void setToLatitude(double toLatitude) {
+		this.toLatitude = toLatitude;
+	}
+
+	public double getToLongitude() {
+		return toLongitude;
+	}
+
+	public void setToLongitude(double toLongitude) {
+		this.toLongitude = toLongitude;
+	}
+
+	public void setStatus(RideStatus status) {
+		this.status = status;
+	}
+
+	// To Location (Destination)
+    private String toLocation;
+    private double toLatitude;
+    private double toLongitude;
 
     @Enumerated(EnumType.STRING)
     private RideStatus status;
@@ -24,7 +67,8 @@ public class Ride {
     public enum RideStatus {
         PENDING,
         COMPLETED,
-        CANCELED
+        CANCELED,
+        ONGOING
     }
 
 	private LocalDateTime createdAt;
@@ -70,8 +114,6 @@ public class Ride {
 	public void setToLocation(String toLocation) {
 		this.toLocation = toLocation;
 	}
-
-	
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;

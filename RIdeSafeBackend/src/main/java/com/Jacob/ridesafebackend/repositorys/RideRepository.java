@@ -9,4 +9,5 @@ import com.Jacob.ridesafebackend.models.Ride;
 @Repository
 public interface RideRepository extends CrudRepository<Ride, String> {
 	List<Ride> findAll();
+	List<Ride> findByDriverIdAndStatus(String driverId, Ride.RideStatus status);
 }
