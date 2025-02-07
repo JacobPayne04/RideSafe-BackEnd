@@ -101,6 +101,13 @@ public class RideController {
         return ResponseEntity.ok(rides);
     }
 
+    
+    @GetMapping("/{id}/map")
+    public ResponseEntity<Map<String, String>> getRideMapUrl(@PathVariable String id) {
+        String googleMapsUrl = rideServ.getGoogleMapsUrl(id);
+        return ResponseEntity.ok(Map.of("googleMapsUrl", googleMapsUrl));
+    }
+  
 
     
 
