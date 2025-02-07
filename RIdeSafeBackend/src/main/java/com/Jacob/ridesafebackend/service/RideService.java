@@ -20,10 +20,34 @@ public class RideService {
 	
 	private static final String GOOGLE_MAPS_DIRECTIONS_URL = "https://www.google.com/maps/dir/?api=1&origin=%f,%f&destination=%f,%f";
 
+<<<<<<< HEAD
 	// stating driverRepo refers to driver repository
 	public RideService(RideRepository rideRepo) {
 		this.rideRepo = rideRepo;
 	}
+=======
+			public Ride saveRide(Ride ride) {
+				return rideRepo.save(ride);
+			}
+				
+			public Optional<Ride> getRideById(String id){
+				return rideRepo.findById(id);
+			}
+			
+			public void updateRideStatus(String id, RideStatus status) {
+				Ride ride = rideRepo.findById(id)
+						.orElseThrow(() -> new RuntimeException("Ride not found"));
+				
+				ride.setRideStatus(status);
+				rideRepo.save(ride);
+			}
+			
+		    public List<Ride> getOngoingRidesByDriverId(String driverId) {
+		        return rideRepo.findByDriverIdAndStatus(driverId, Ride.RideStatus.ONGOING);
+		    }
+				
+}			
+>>>>>>> b47ad560de84a505f3843b8b37885923c6a7ab02
 
 	public Ride saveRide(Ride ride) {
 		return rideRepo.save(ride);
