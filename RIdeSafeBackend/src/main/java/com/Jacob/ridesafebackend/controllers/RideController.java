@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Ride;
@@ -23,92 +24,124 @@ import com.Jacob.ridesafebackend.service.RideService;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class RideController {
-	
-	 private final SimpMessagingTemplate messagingTemplate; 
+
+	private final SimpMessagingTemplate messagingTemplate;
 
 	@Autowired
 	private final RideService rideServ; // Using rideServ for the variable name
 
-    // Constructor for dependency injection
-    public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate) {
-        this.rideServ = rideServ;
-        this.messagingTemplate = messagingTemplate;
-    }
+	// Constructor for dependency injection
+	public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate) {
+		this.rideServ = rideServ;
+		this.messagingTemplate = messagingTemplate;
+	}
 
-    @PostMapping("/rides/save")
-    public ResponseEntity<String> saveRide(@RequestBody Ride ride) {
-        Ride savedRide = rideServ.saveRide(ride); // Using rideServ consistently
-        System.out.println("Notification sent to /topic/driver/" + savedRide.getDriverId());
+	@PostMapping("/rides/save")
+	public ResponseEntity<String> saveRide(@RequestBody Ride ride) {
+		Ride savedRide = rideServ.saveRide(ride); // Using rideServ consistently
+		System.out.println("Notification sent to /topic/driver/" + savedRide.getDriverId());
 
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("message", "New ride request from passenger.");
-        notification.put("passengerId", savedRide.getPassengerId());
-        notification.put("rideId", savedRide.getId());
-        notification.put("status", savedRide.getStatus());
-        notification.put("fromLocation", savedRide.getFromLocation());
-        notification.put("fromLatitude", savedRide.getFromLatitude());
-        notification.put("fromLongitude", savedRide.getFromLongitude());
-        notification.put("toLocation", savedRide.getToLocation());
-        notification.put("toLatitude", savedRide.getToLatitude());
-        notification.put("toLongitude", savedRide.getToLongitude());
+		Map<String, Object> notification = new HashMap<>();
+		notification.put("message", "New ride request from passenger.");
+		notification.put("passengerId", savedRide.getPassengerId());
+		notification.put("rideId", savedRide.getId());
+		notification.put("status", savedRide.getStatus());
+		notification.put("fromLocation", savedRide.getFromLocation());
+		notification.put("fromLatitude", savedRide.getFromLatitude());
+		notification.put("fromLongitude", savedRide.getFromLongitude());
+		notification.put("toLocation", savedRide.getToLocation());
+		notification.put("toLatitude", savedRide.getToLatitude());
+		notification.put("toLongitude", savedRide.getToLongitude());
 
-        messagingTemplate.convertAndSend(
-                "/topic/driver/" + savedRide.getDriverId(),
-                notification
-        );
+		messagingTemplate.convertAndSend("/topic/driver/" + savedRide.getDriverId(), notification);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body("Ride scheduled successfully with ID: " + savedRide.getId());
-    }
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body("Ride scheduled successfully with ID: " + savedRide.getId());
+	}
 
-	//Get ride by Id
-    @GetMapping("/ride/{id}")
-    public ResponseEntity<Ride> getRideById(@PathVariable String id) {
-        Optional<Ride> ride = rideServ.getRideById(id);
-        return ride.map(ResponseEntity::ok)
-                   .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-    }
-    
-    
-    @PutMapping("/{id}/accept")
-    public ResponseEntity<String> acceptRide(@PathVariable String id) {
-        try {
-            // Convert the String "Ongoing" to RideStatus enum
-            Ride.RideStatus status = Ride.RideStatus.valueOf("ONGOING");
+	// Get ride by Id
+	@GetMapping("/ride/{id}")
+	public ResponseEntity<Ride> getRideById(@PathVariable String id) {
+		Optional<Ride> ride = rideServ.getRideById(id);
+		return ride.map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+	}
 
-            // Call the service with the converted enum
-            rideServ.updateRideStatus(id, status);
+	@PutMapping("/{id}/accept/onGoing") // TODO# add ongoing in route, and add IN_QUEUE in enum in ride model TODO# make
+	// "acceptRide" service method to acceptRideOngoing
+	public ResponseEntity<String> acceptRide(@PathVariable String id) {
+		try {
+			// Convert the String "Ongoing" to RideStatus enum
+			Ride.RideStatus status = Ride.RideStatus.valueOf("ONGOING");
 
-            return ResponseEntity.ok("Ride accepted and updated to Ongoing.");
-        } catch (IllegalArgumentException e) {
-            // This will catch invalid  values
-            return ResponseEntity.badRequest().body("Invalid status value.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found.");
-        }
-    }
-    
- // Get ongoing rides for driver by driver ID
-    @GetMapping("/driver/{id}/rides/ongoing")
-    public ResponseEntity<List<Ride>> getOngoingRidesByDriverId(@PathVariable String id) {
-        List<Ride> rides = rideServ.getOngoingRidesByDriverId(id);
+			// Call the service with the converted enum
+			rideServ.updateRideStatus(id, status);
 
-        if (rides.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
+			return ResponseEntity.ok("Ride accepted and updated to Ongoing.");
+		} catch (IllegalArgumentException e) {
+			// This will catch invalid values
+			return ResponseEntity.badRequest().body("Invalid status value.");
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found.");
+		}
+	}
 
-        return ResponseEntity.ok(rides);
-    }
+	@PutMapping("/{id}/accept/complete") // TODO# add ongoing in route, and add IN_QUEUE in enum in ride model TODO#
+											// make
+	// "acceptRide" service method to acceptRideOngoing
+	public ResponseEntity<String> acceptRideComplete(@PathVariable String id) {
+		try {
+			// Convert the String "COMPLETED" to RideStatus enum
+			Ride.RideStatus status = Ride.RideStatus.valueOf("COMPLETED");
 
-    
-    @GetMapping("/{id}/map")
-    public ResponseEntity<Map<String, String>> getRideMapUrl(@PathVariable String id) {
-        String googleMapsUrl = rideServ.getGoogleMapsUrl(id);
-        return ResponseEntity.ok(Map.of("googleMapsUrl", googleMapsUrl));
-    }
-  
+			// Call the service with the converted enum
+			rideServ.updateRideStatus(id, status);
 
-    
+			return ResponseEntity.ok("Ride accepted and updated to Ongoing.");
+		} catch (IllegalArgumentException e) {
+			// This will catch invalid values
+			return ResponseEntity.badRequest().body("Invalid status value.");
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found.");
+		}
+	}
+
+	@PutMapping("/{rideId/accept/{driverId}")
+	public ResponseEntity<Ride> acceptRide(@PathVariable String rideId, @PathVariable String driverId) {
+		Ride ride = rideServ.acceptRide(rideId, driverId);
+		if (ride != null) {
+			return new ResponseEntity<>(ride, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+
+	}
+
+	@PutMapping("/{rideId}/complete")
+	public ResponseEntity<Ride> completeRide(@PathVariable String rideId, @RequestParam String driverId) {
+		Ride ride = rideServ.completeRide(rideId,driverId);
+		if (ride != null) {
+			return new ResponseEntity<>(ride, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// Get ongoing rides for driver by driver ID
+	@GetMapping("/driver/{id}/rides/ongoing")
+	public ResponseEntity<List<Ride>> getOngoingRidesByDriverId(@PathVariable String id) {
+		List<Ride> rides = rideServ.getOngoingRidesByDriverId(id);
+
+		if (rides.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		}
+
+		return ResponseEntity.ok(rides);
+	}
+
+	@GetMapping("/{id}/MapRoute")
+	public ResponseEntity<Map<String, String>> getRideMapUrl(@PathVariable String id) {
+		String googleMapsUrl = rideServ.getGoogleMapsUrl(id);
+		return ResponseEntity.ok(Map.of("googleMapsUrl", googleMapsUrl));
+	}
 
 }
