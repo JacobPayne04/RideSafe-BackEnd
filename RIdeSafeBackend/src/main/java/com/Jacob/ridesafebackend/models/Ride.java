@@ -60,16 +60,27 @@ public class Ride {
     private String toLocation;
     private double toLatitude;
     private double toLongitude;
+    private int queuePosition;
 
-    @Enumerated(EnumType.STRING)
+    public int getQueuePosition() {
+		return queuePosition;
+	}
+
+	public void setQueuePosition(int queuePosition) {
+		this.queuePosition = queuePosition;
+	}
+
+	@Enumerated(EnumType.STRING)
     private RideStatus status;
 
     public enum RideStatus {
         PENDING,
         COMPLETED,
         CANCELED,
-        ONGOING
+        ONGOING,
+        INQUEUE
     }
+
 
 	private LocalDateTime createdAt;
 	

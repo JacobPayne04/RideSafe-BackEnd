@@ -55,7 +55,7 @@ public class DriverController {
 	
 	// Getting One Driver
 	@GetMapping("/driver/{id}")
-    public ResponseEntity<?> getDriverById(@PathVariable("id") String id) {	// Pass in the drivers Id to send to the frontend
+    public ResponseEntity<?> getDriverById(@PathVariable("id") String id)  {	// Pass in the drivers Id to send to the frontend
 		
         Optional<Driver> driver = driverServ.getDriverById(id); // fetching a driver by its id
 
