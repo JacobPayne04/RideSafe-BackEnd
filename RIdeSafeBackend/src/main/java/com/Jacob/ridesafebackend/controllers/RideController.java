@@ -105,7 +105,7 @@ public class RideController {
 		}
 	}
 
-	@PutMapping("/{rideId/accept/{driverId}")
+	@PutMapping("/{rideId}/accept/{driverId}")
 	public ResponseEntity<Ride> acceptRide(@PathVariable String rideId, @PathVariable String driverId) {
 		Ride ride = rideServ.acceptRide(rideId, driverId);
 		if (ride != null) {
