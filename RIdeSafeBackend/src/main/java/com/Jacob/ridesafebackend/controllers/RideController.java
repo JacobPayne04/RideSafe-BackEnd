@@ -66,24 +66,7 @@ public class RideController {
 		return ride.map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 
-	@PutMapping("/{id}/accept/onGoing") // TODO# add ongoing in route, and add IN_QUEUE in enum in ride model TODO# make
-	// "acceptRide" service method to acceptRideOngoing
-	public ResponseEntity<String> acceptRide(@PathVariable String id) {
-		try {
-			// Convert the String "Ongoing" to RideStatus enum
-			Ride.RideStatus status = Ride.RideStatus.valueOf("ONGOING");
-
-			// Call the service with the converted enum
-			rideServ.updateRideStatus(id, status);
-
-			return ResponseEntity.ok("Ride accepted and updated to Ongoing.");
-		} catch (IllegalArgumentException e) {
-			// This will catch invalid values
-			return ResponseEntity.badRequest().body("Invalid status value.");
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ride not found.");
-		}
-	}
+	
 
 	@PutMapping("/{id}/accept/complete") // TODO# add ongoing in route, and add IN_QUEUE in enum in ride model TODO#
 											// make
