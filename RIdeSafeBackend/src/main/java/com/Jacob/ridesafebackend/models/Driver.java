@@ -41,7 +41,16 @@ public class Driver {
 	@Size(min = 5,max = 9,message = "License plate must be between 3 and 9 characters" )
 	private String licensePlate;
 	
+	private String googleId; 
 	
+
+	public String getGoogleId() {
+		return googleId;
+	}
+
+	public void setGoogleId(String googleId) {
+		this.googleId = googleId;
+	}
 
 	//What we call in the routes
 	public Driver() {}

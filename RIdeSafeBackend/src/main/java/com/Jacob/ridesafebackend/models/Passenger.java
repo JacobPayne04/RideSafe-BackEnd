@@ -31,8 +31,18 @@ public class Passenger {
     @NotEmpty(message = "ConfirmPassword is required!")
     @Size(min = 8,max = 128,message = "Confirm Password must be between 8 and 200 characters" )
     private String confirm;
+    
+    private String googleId; 
 
-    public Passenger() {}
+    public String getGoogleId() {
+		return googleId;
+	}
+
+	public void setGoogleId(String googleId) {
+		this.googleId = googleId;
+	}
+
+	public Passenger() {}
 
 	public String getId() {
 		return id;
