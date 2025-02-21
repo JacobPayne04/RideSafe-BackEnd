@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import com.Jacob.ridesafebackend.models.LoginPassenger;
 import com.Jacob.ridesafebackend.models.Passenger;
@@ -90,10 +92,17 @@ public class PassengerController {
 	      
 	    }
 	
+	   
+	 //  @PostMapping("/signup/Passenger/googelId")
+	 //  public ResponseEntity<Passenger> googleSingIn(@PathVariable String ){
 	
-	
-	
-	
+		   
+	//	  return ResponseEntity.ok(passneger);
+	  // }
+	   
+	   //TODO# unload the payload of the email and the google id and then vlaidate the toklen if the user is in the data base
+	   //and if the token is vlaid login if no user return no user sing up and then redirect on the fornt end to the finish singin gup -page
+	   //then have a controller method api call for saving that info form the front end 
 	
 	
 	

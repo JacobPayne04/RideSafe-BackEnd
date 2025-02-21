@@ -60,6 +60,12 @@ public class DriverService {
 		return driverMongoRepo.findByIsOnlineTrue();
 	}
     
+public Optional<Driver> findDriverByEmailOrGoogleId(String email,String googleId){
+	return driverRepo.findDriverByGoogleId(email,googleId);
+}
+
+//TODO# validate toekn service 
+
     
 }
 

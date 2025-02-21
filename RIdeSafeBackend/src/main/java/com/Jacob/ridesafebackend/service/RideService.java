@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
+import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.models.Ride.RideStatus;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
@@ -116,7 +118,7 @@ public class RideService {
 				ride.getToLatitude(), ride.getToLongitude(), apiKey);
 
 	}
-
-	//
+	
+	
 
 }
