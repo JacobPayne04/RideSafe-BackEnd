@@ -1,6 +1,7 @@
 package com.Jacob.ridesafebackend.repositorys;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,8 @@ public interface DriverRepository extends CrudRepository<Driver,String> {
 	List<Driver> findAll();
 
 	Driver findByEmail(String email);
+	
+	Optional<Driver> findDriverByGoogleId(String email, String googleId);
 
 }
 

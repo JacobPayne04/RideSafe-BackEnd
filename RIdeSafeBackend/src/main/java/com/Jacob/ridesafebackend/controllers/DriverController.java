@@ -40,8 +40,6 @@ public class DriverController {
 		
 		Driver creatDriver = driverServ.creatDriver(driver);
 		
-		
-		
 		return ResponseEntity.ok(creatDriver);
 	}
 	
@@ -105,6 +103,22 @@ public class DriverController {
 		   return ResponseEntity.ok(onlineDrivers);
 		  
 	   }
+	   
+	   //@PutMapping("/singup/Driver/googelId")
+	 //  public ResponseEntity<Driver> createDriverGoogle(@RequestBody Map<String,String> payload){
+	//	   String email = payload.get("email");
+		//   String googleId = payload.get("googelId");
+	   //TODO# unload the payload of the email and the google id and then vlaidate the toklen if the user is in the data base
+	   //and if the token is vlaid login if no user return no user sing up and then redirect on the fornt end to the finish singin gup -page
+	   //then have a controller method api call for saving that info form the front end 
+		//   
+		//  return driverServ.findByEmailOrGoogleId(email,googleId).map(driver -> ResponseEntity.o)
+		   
+		////   return ResponseEntity.ok(createdDriver);
+	   //}
+	   
+	
+	   
 	
 
 }
