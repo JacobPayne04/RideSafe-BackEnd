@@ -2,6 +2,8 @@ package com.Jacob.ridesafebackend.service;
 
 import java.util.Optional;
 
+import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.Jacob.ridesafebackend.models.Driver;
@@ -9,8 +11,7 @@ import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.repositorys.DriverRepository;
 import com.Jacob.ridesafebackend.repositorys.PassengerRepository;
 
-import org.json.JSONObject;
-
+@Service
 public class GoogleAuthentication {
 	private final DriverRepository driverRepo;
 	private final PassengerRepository passengerRepo;
