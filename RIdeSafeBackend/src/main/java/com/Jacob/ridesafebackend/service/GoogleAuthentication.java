@@ -44,11 +44,11 @@ public class GoogleAuthentication {
 		return driverRepo.findDriverByGoogleId(emial, idToken);
 	}
 	
-	public Optional<Passenger> loginPassengerWithGoogle(String googelId,String emial, String idToken){
+	public Optional<Passenger> loginPassengerWithGoogle(String googelId,String email, String idToken){
 		if(!validateGoogleToken(idToken)) {
 			throw new RuntimeException("invalid Google Token");
 		}
-		return passengerRepo.findPassengerByGoogleId(emial, idToken);
+		return passengerRepo.findPassengerByGoogleId(email, idToken);
 	}
 	
 	
