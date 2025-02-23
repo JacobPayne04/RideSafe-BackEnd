@@ -116,7 +116,7 @@ public class DriverController {
 			if(driver.isPresent()) {
 				return ResponseEntity.ok(driver.get());
 			} else {
-				return ResponseEntity.status(404).body("Redirect: Complete passenger registration");
+				return ResponseEntity.status(404).body("Redirect: Complete driver registration");
 			}
 			
 		 }

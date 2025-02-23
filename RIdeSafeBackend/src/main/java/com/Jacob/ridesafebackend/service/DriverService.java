@@ -26,8 +26,14 @@ public class DriverService {
 	}
 
 	public Driver creatDriver(Driver driver) {
-		String hashed = BCrypt.hashpw(driver.getPassword(), BCrypt.gensalt());
-		driver.setPassword(hashed);
+		
+		if(driver.getPassword() != null && !driver.getPassword().isEmpty()) {
+			String hashed = BCrypt.hashpw(driver.getPassword(), BCrypt.gensalt());
+			driver.setPassword(hashed);
+		} else {
+			driver.setPassword(null);
+		}
+
 		return driverRepo.save(driver);
 	}
 
