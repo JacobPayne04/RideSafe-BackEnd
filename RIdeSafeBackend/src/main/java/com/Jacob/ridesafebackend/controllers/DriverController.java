@@ -24,7 +24,7 @@ import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import jakarta.servlet.http.HttpSession;
 
 //*FOR DRIVER PROCESS ROUTES*
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController // Changed from Controller to RestController
 public class DriverController {
 	
