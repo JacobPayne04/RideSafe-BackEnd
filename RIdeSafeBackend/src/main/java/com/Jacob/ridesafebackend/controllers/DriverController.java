@@ -24,7 +24,7 @@ import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import jakarta.servlet.http.HttpSession;
 
 //*FOR DRIVER PROCESS ROUTES*
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController // Changed from Controller to RestController
 public class DriverController {
 	
@@ -116,7 +116,7 @@ public class DriverController {
 			if(driver.isPresent()) {
 				return ResponseEntity.ok(driver.get());
 			} else {
-				 return ResponseEntity.ok("Redirect: Complete passenger registration");
+				return ResponseEntity.status(404).body("Redirect: Complete driver registration");
 			}
 			
 		 }
