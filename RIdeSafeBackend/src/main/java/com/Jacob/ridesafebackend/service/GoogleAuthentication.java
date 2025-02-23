@@ -1,5 +1,6 @@
 package com.Jacob.ridesafebackend.service;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.json.JSONObject;
@@ -12,6 +13,10 @@ import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.repositorys.DriverRepository;
 import com.Jacob.ridesafebackend.repositorys.PassengerRepository;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 
 @Service
 public class GoogleAuthentication {
@@ -24,6 +29,22 @@ public class GoogleAuthentication {
 		this.driverRepo = driverRepo;
 		this.passengerRepo = passengerRepo;
 	}
+	
+	private static final String CLIENT_ID = "862444779234-9vchmg8lfjgj6stpfbq16bk2k0qrdqqg.apps.googleusercontent.com";
+
+    public static GoogleIdToken.Payload verifyGoogleToken(String idTokenString) throws Exception {
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                new NetHttpTransport(), new GsonFactory())
+                .setAudience(Collections.singletonList(CLIENT_ID))
+                .build();
+
+        GoogleIdToken idToken = verifier.verify(idTokenString);
+        if (idToken != null) {
+            return idToken.getPayload();
+        } else {
+            throw new RuntimeException("Invalid Google Token");
+        }
+    }
 	
 	
 	private boolean validateGoogleToken(String idToken) {
