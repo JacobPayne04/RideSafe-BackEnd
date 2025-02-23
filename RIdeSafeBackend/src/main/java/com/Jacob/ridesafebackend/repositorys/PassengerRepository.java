@@ -16,7 +16,7 @@ public interface PassengerRepository extends CrudRepository<Passenger, String> {
 	Passenger findByEmail(String email);
 	
 	
-		Optional<Passenger> findPassengerByGoogleId(String email,String googelId);
+		Optional<Passenger> findPassengerByGoogleId(String googelId);
 	
 
 	

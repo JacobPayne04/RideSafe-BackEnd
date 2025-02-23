@@ -39,18 +39,18 @@ public class GoogleAuthentication {
 		}
 	}
 	
-	public Optional<Driver> loginDriverWithGoogle(String googelId,String emial, String idToken){
+	public Optional<Driver> loginDriverWithGoogle(String googleId, String idToken){
 		if(!validateGoogleToken(idToken)) {
 			 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Google Token");
 		}
-		return driverRepo.findDriverByGoogleId(emial, idToken);
+		return driverRepo.findDriverByGoogleId(googleId);
 	}
 	
-	public Optional<Passenger> loginPassengerWithGoogle(String googelId,String email, String idToken){
+	public Optional<Passenger> loginPassengerWithGoogle(String googleId, String idToken){
 		if(!validateGoogleToken(idToken)) {
 			 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Google Token");
 		}
-		return passengerRepo.findPassengerByGoogleId(email, idToken);
+		return passengerRepo.findPassengerByGoogleId(googleId);
 	}
 	
 	
