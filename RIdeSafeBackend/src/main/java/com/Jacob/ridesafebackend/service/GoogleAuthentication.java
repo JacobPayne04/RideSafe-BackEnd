@@ -3,8 +3,10 @@ package com.Jacob.ridesafebackend.service;
 import java.util.Optional;
 
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.Passenger;
@@ -39,14 +41,14 @@ public class GoogleAuthentication {
 	
 	public Optional<Driver> loginDriverWithGoogle(String googelId,String emial, String idToken){
 		if(!validateGoogleToken(idToken)) {
-			throw new RuntimeException("invalid Google Token");
+			 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Google Token");
 		}
 		return driverRepo.findDriverByGoogleId(emial, idToken);
 	}
 	
 	public Optional<Passenger> loginPassengerWithGoogle(String googelId,String email, String idToken){
 		if(!validateGoogleToken(idToken)) {
-			throw new RuntimeException("invalid Google Token");
+			 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Google Token");
 		}
 		return passengerRepo.findPassengerByGoogleId(email, idToken);
 	}
