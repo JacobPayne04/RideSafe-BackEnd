@@ -1,7 +1,9 @@
 package com.Jacob.ridesafebackend.controllers;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Jacob.ridesafebackend.controllers.PassengerController.GoogleLoginRequest;
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.service.DriverService;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -108,18 +110,50 @@ public class DriverController {
 		  
 	   }
 	   
-	   @PostMapping("/signup/driver/googleId")
-		  public ResponseEntity<?> googleSingIn(@RequestBody GoogleLoginRequest  request){
-			Optional<Driver> driver = GoogleAuth.loginDriverWithGoogle(
-					request.googleId(), request.email(),request.idToken());
-			
-			if(driver.isPresent()) {
-				return ResponseEntity.ok(driver.get());
-			} else {
-				return ResponseEntity.status(404).body("Redirect: Complete driver registration");
-			}
-			
-		 }
+//	   @PostMapping("/signup/driver/googleId")
+//		  public ResponseEntity<?> googleSingIn(@RequestBody GoogleLoginRequest  request){
+//			Optional<Driver> driver = GoogleAuth.loginDriverWithGoogle(
+//					request.googleId(), request.email(),request.idToken());
+//			
+//			if(driver.isPresent()) {
+//				return ResponseEntity.ok(driver.get());
+//			} else {
+//				return ResponseEntity.status(404).body("Redirect: Complete driver registration");
+//			}
+//			
+//		 }
+	   
+	   @PostMapping("/signup/{role}/googleId")
+	   public ResponseEntity<?> googleSignIn(@PathVariable String role, @RequestBody Map<String, String> requestBody) {
+	        try {
+	            String idToken = requestBody.get("googleId");
+	            GoogleIdToken.Payload payload = GoogleAuthentication.verifyGoogleToken(idToken);
+	            
+	            if (payload == null) {
+	                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google Token");
+	            }
+	            
+	            String email = payload.getEmail();
+	            String googleId = payload.getSubject();
+	            
+	            // Now, handle logic based on the role
+	            if ("driver".equals(role)) {
+	                // Handle driver-specific logic (e.g., create or find driver)
+	                System.out.println("Driver email: " + email);
+	                // Implement driver registration logic here
+	            } else if ("passenger".equals(role)) {
+	                // Handle passenger-specific logic (e.g., create or find passenger)
+	                System.out.println("Passenger email: " + email);
+	                // Implement passenger registration logic here
+	            } else {
+	                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid role");
+	            }
+
+	            return ResponseEntity.ok(Collections.singletonMap("message", role + " Google Sign-In Successful"));
+	        } catch (Exception e) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Google Sign-In Failed: " + e.getMessage());
+	        }
+	    }
 	
 	   
 	

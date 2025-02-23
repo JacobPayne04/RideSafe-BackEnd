@@ -89,20 +89,20 @@ public class PassengerController {
 	      
 	    }
 
-	@PostMapping("/signup/passenger/googleId")
-	  public ResponseEntity<?> googleSingIn(@RequestBody GoogleLoginRequest  request){
-		Optional<Passenger> passenger = GoogleAuth.loginPassengerWithGoogle(
-				request.googleId(), request.email(),request.idToken());
-		
-		if(passenger.isPresent()) {
-			return ResponseEntity.ok(passenger.get());
-		} else {
-			return ResponseEntity.status(404).body("Redirect: Complete passenger registration");
-		}
-		
-	 }
-	
-	public record GoogleLoginRequest(String googleId, String email, String idToken) {}
+//	@PostMapping("/signup/passenger/googleId")
+//	  public ResponseEntity<?> googleSingIn(@RequestBody GoogleLoginRequest  request){
+//		Optional<Passenger> passenger = GoogleAuth.loginPassengerWithGoogle(
+//				request.googleId(), request.email(),request.idToken());
+//		
+//		if(passenger.isPresent()) {
+//			return ResponseEntity.ok(passenger.get());
+//		} else {
+//			return ResponseEntity.status(404).body("Redirect: Complete passenger registration");
+//		}
+//		
+//	 }
+//	
+//	public record GoogleLoginRequest(String googleId, String email, String idToken) {}
 
 	  //TODO# unload the payload of the email and the google id and then vlaidate the toklen if the user is in the data base
 	  //and if the token is vlaid login if no user return no user sing up and then redirect on the fornt end to the finish singin gup -page
