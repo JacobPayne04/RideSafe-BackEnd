@@ -92,7 +92,7 @@ public class PassengerController {
 	@PostMapping("/signup/passenger/googleId")
 	  public ResponseEntity<?> googleSingIn(@RequestBody GoogleLoginRequest  request){
 		Optional<Passenger> passenger = GoogleAuth.loginPassengerWithGoogle(
-				request.googleId(), request.email(),request.idToken());
+				request.googleId(),request.idToken());
 		
 		if(passenger.isPresent()) {
 			return ResponseEntity.ok(passenger.get());

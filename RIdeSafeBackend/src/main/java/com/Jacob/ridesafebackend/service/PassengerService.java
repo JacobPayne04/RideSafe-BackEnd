@@ -47,8 +47,8 @@ public class PassengerService {
 	        return BCrypt.checkpw(rawPassword, hashedPassword);
 	    }
 		
-	    public Optional<Passenger> findPassengerByEmailOrGoogleId(String email,String googleId){
-	    	return passengerRepo.findPassengerByGoogleId(email,googleId);
+	    public Optional<Passenger> findPassengerByEmailOrGoogleId(String googleId){
+	    	return passengerRepo.findPassengerByGoogleId(googleId);
 	    }
 
 		

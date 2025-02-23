@@ -16,7 +16,6 @@ public class DriverService {
 	private final DriverRepository driverRepo; // #TODO create getters and setters !*
 	private final DriverMongoRepository driverMongoRepo;
 
-
 	// stating driverRepo refers to driver repository
 
 	public DriverService(DriverRepository driverRepo, DriverMongoRepository driverMongoRepo) {
@@ -26,8 +25,8 @@ public class DriverService {
 	}
 
 	public Driver creatDriver(Driver driver) {
-		
-		if(driver.getPassword() != null && !driver.getPassword().isEmpty()) {
+
+		if (driver.getPassword() != null && !driver.getPassword().isEmpty()) {
 			String hashed = BCrypt.hashpw(driver.getPassword(), BCrypt.gensalt());
 			driver.setPassword(hashed);
 		} else {
@@ -66,8 +65,8 @@ public class DriverService {
 		return driverMongoRepo.findByIsOnlineTrue();
 	}
 
-	public Optional<Driver> findDriverByEmailOrGoogleId(String email, String googleId) {
-		return driverRepo.findDriverByGoogleId(email, googleId);
+	public Optional<Driver> findDriverGoogleId(String googleId) {
+		return driverRepo.findDriverByGoogleId(googleId);
 	}
 
 }

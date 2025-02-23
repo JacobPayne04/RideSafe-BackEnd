@@ -14,7 +14,7 @@ public interface DriverRepository extends CrudRepository<Driver,String> {
 
 	Driver findByEmail(String email);
 	
-	Optional<Driver> findDriverByGoogleId(String email, String googleId);
+	Optional<Driver> findDriverByGoogleId(String googleId);
 
 }
 
