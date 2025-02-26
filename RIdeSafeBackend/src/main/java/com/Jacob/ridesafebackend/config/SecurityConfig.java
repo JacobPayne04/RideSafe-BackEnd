@@ -10,14 +10,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()  // Disable CSRF (unless you need it)
-            .cors().disable()  // Disable CORS (you might need it if using cross-origin requests)
-            .authorizeRequests()
-                .anyRequest().permitAll();  // Allow all requests (adjust as needed)
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	    http
+	        .csrf(csrf -> csrf.disable()) // Correct way in Spring Security 6+
+	        .cors(cors -> cors.disable()) // Correct way in Spring Security 6+
+	        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
-        return http.build();
-    }
+	    return http.build();
+	}
+
 }

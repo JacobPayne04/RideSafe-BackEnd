@@ -46,9 +46,15 @@ public class DriverService {
 	}
 
 	// Retrieve a driver by email
-	public Driver getDriver(String email) {
-		return driverRepo.findByEmail(email);
-	}
+    public Optional<Driver> getDriverByEmail(String email) {
+        return driverRepo.findByEmail(email);
+    }
+
+    // ✅ Used for regular login (throws an error if not found)
+    public Driver getDriver(String email) {
+        return driverRepo.findByEmail(email)
+            .orElse(null);  // Returns null if no driver exists (or throw an exception if needed)
+    }
 
 	// Authenticate a driver by verifying their password
 	public boolean authenticateDriver(String rawPassword, String hashedPassword) {
@@ -68,5 +74,6 @@ public class DriverService {
 	public Optional<Driver> findDriverGoogleId(String googleId) {
 		return driverRepo.findDriverByGoogleId(googleId);
 	}
+
 
 }
