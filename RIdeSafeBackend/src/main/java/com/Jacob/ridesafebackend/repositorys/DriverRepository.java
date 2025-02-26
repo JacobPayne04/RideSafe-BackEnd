@@ -14,7 +14,7 @@ public interface DriverRepository extends CrudRepository<Driver,String> {
 	List<Driver> findAll();
 	
 	@Query("{ 'email' : ?0 }")
-	Optional<Driver> findByEmail(String email);
+	List<Driver> findAllByEmail(String email);
 	
 	Optional<Driver> findDriverByGoogleId(String googleId);
 

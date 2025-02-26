@@ -46,15 +46,26 @@ public class DriverService {
 	}
 
 	// Retrieve a driver by email
-    public Optional<Driver> getDriverByEmail(String email) {
-        return driverRepo.findByEmail(email);
-    }
+	public Optional<Driver> getDriverByEmail(String email) {
+	    // Use a repository method that returns a List of drivers with the given email
+	    List<Driver> drivers = driverRepo.findAllByEmail(email);
+	    if (drivers.isEmpty()) {
+	        return Optional.empty();
+	    } else if (drivers.size() > 1) {
+	        System.out.println("Warning: Multiple drivers found with the same email: " + email);
+	    }
+	    return Optional.of(drivers.get(0));
+	}
 
-    // ✅ Used for regular login (throws an error if not found)
-    public Driver getDriver(String email) {
-        return driverRepo.findByEmail(email)
-            .orElse(null);  // Returns null if no driver exists (or throw an exception if needed)
-    }
+	// ✅ Used for regular login (throws an error if not found)
+	public Driver getDriver(String email) {
+	    List<Driver> drivers = driverRepo.findAllByEmail(email);
+	    if (drivers.isEmpty()) {
+	        throw new RuntimeException("Driver not found with email: " + email);
+	    }
+	    return drivers.get(0);  // Returns the first driver found
+	}
+
 
 	// Authenticate a driver by verifying their password
 	public boolean authenticateDriver(String rawPassword, String hashedPassword) {
