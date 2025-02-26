@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
-
-
 import org.springframework.stereotype.Service;
 
-
+import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.repositorys.PassengerRepository;
 
@@ -36,11 +34,27 @@ public class PassengerService {
 			return passengerRepo.findById(id);
 		}
 		
+		// Retrieve a passenger by email ??******************************* THIS IS NEW
+		public Optional<Passenger> getPassengerByEmail(String email) {
+		    // Use a repository method that returns a List of drivers with the given email
+		    List<Passenger> passengers = passengerRepo.findAllByEmail(email);
+		    if (passengers.isEmpty()) {
+		        return Optional.empty();
+		    } else if (passengers.size() > 1) {
+		        System.out.println("Warning: Multiple drivers found with the same email: " + email);
+		    }
+		    return Optional.of(passengers.get(0));
+		}
+		
 
-		 // Retrieve a driver by email
-	    public Passenger getPassenger(String email) {
-	        return passengerRepo.findByEmail(email);
-	    }
+		// ✅ Used for regular (throws an error if not found)
+		public Passenger getPassenger(String email) {
+		    List<Passenger> passengers = passengerRepo.findAllByEmail(email);
+		    if (passengers.isEmpty()) {
+		        throw new RuntimeException("Passenger not found with email: " + email);
+		    }
+		    return passengers.get(0);  // Returns the first driver found
+		}
 
 	    // Authenticate a driver by verifying their password
 	    public boolean authenticatePassenger(String rawPassword, String hashedPassword) {

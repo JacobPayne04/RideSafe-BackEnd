@@ -45,7 +45,7 @@ public class DriverService {
 		return driverRepo.findById(id);
 	}
 
-	// Retrieve a driver by email
+	// Retrieve a driver by email ??******************************* THIS IS NEW
 	public Optional<Driver> getDriverByEmail(String email) {
 	    // Use a repository method that returns a List of drivers with the given email
 	    List<Driver> drivers = driverRepo.findAllByEmail(email);
