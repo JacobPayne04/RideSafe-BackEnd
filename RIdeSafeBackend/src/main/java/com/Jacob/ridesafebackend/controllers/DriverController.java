@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.LoginDriver;
+import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.service.DriverService;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
+import com.Jacob.ridesafebackend.service.PassengerService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import jakarta.servlet.http.HttpSession;
@@ -33,10 +35,12 @@ public class DriverController {
 	@Autowired
 	private final DriverService driverServ;
 	private final GoogleAuthentication GoogleAuth;
+	private final PassengerService passengerServ;
 
-	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth) {
+	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ) {
 		this.driverServ = driverServ;
 		this.GoogleAuth = GoogleAuth;
+		this.passengerServ = passengerServ;
 	}
 
 	@PostMapping("/new")
@@ -156,6 +160,30 @@ public class DriverController {
 	                ));
 	            }
 	        }
+	        
+	        if ("passenger".equals(role)) {
+	            Optional<Passenger> existingPassenger = passengerServ.getPassengerByEmail(email);
+	            System.out.println("Passenger Lookup Result: " + existingPassenger);
+
+	            if (existingPassenger.isPresent()) {
+	                Passenger passenger = existingPassenger.get();
+	                session.setAttribute("passengerId", passenger.getId());
+	                System.out.println("Passenger Exists. ID: " + passenger.getId());
+
+	                return ResponseEntity.ok(Map.of(
+	                    "exists", true,
+	                    "passengerId", passenger.getId(),
+	                    "message", "Passenger found, proceed to home."
+	                ));
+	            } else {
+	                System.out.println("New Passenger Detected. Redirecting to Registration.");
+
+	                return ResponseEntity.ok(Map.of(
+	                    "exists", false,
+	                    "message", "New Passenger, please proceed to registration."
+	                ));
+	            }
+	        }
 
 	        System.out.println("Error: Invalid role received - " + role);
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid role: " + role);
@@ -170,29 +198,5 @@ public class DriverController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Google Sign-In Failed: " + e.getMessage());
 	    }
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-//	@PostMapping("/signup/driver/googleId")
-//	public ResponseEntity<?> googleSingIn(@RequestBody GoogleLoginRequest request) {
-//		Optional<Driver> driver = GoogleAuth.loginDriverWithGoogle(request.googleId(), request.idToken());
-//
-//		if (driver.isPresent()) {
-//			return ResponseEntity.ok(driver.get());
-//		} else {
-//			return ResponseEntity.status(404).body("Redirect: Complete driver registration");
-//		}
-//
-//	}
 
 }
