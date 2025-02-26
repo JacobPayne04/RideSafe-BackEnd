@@ -1,5 +1,6 @@
 package com.Jacob.ridesafebackend.models;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.persistence.Id;
@@ -26,6 +27,7 @@ public class Driver {
 	
 	@NotEmpty(message = "Email is required!")
 	@Email(message = "Please enter a valid email!")
+	@Indexed(unique = true)
 	 private String email;
 	
 	@NotEmpty(message = "Password is required!")

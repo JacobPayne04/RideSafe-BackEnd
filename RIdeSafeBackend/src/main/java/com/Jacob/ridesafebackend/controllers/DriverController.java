@@ -1,5 +1,5 @@
 package com.Jacob.ridesafebackend.controllers;
-import java.util.Collections;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,21 +70,20 @@ public class DriverController {
 
 	@PostMapping("/login")
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginDriver loginDriver, HttpSession session) {
-		// Fetch the driver by email
-		Driver existingDriver = driverServ.getDriver(loginDriver.getEmail());
+	    // Fetch the driver by email
+	    Driver existingDriver = driverServ.getDriver(loginDriver.getEmail());
 
-		if (existingDriver == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Unknown email"));
-		}
+	    if (existingDriver == null) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Unknown email"));
+	    }
 
-		// Check the password using BCrypt
-		if (!BCrypt.checkpw(loginDriver.getPassword(), existingDriver.getPassword())) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Incorrect password"));
-		}
+	    // Check the password using BCrypt
+	    if (!BCrypt.checkpw(loginDriver.getPassword(), existingDriver.getPassword())) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Incorrect password"));
+	    }
 
-		// Login successful
-		return ResponseEntity.ok(Map.of("message", "Login successful", "id", existingDriver.getId()));
-
+	    // Login successful
+	    return ResponseEntity.ok(Map.of("message", "Login successful", "id", existingDriver.getId()));
 	}
 
 	// ROUTES FOR DRIVER
@@ -105,37 +104,82 @@ public class DriverController {
 
 
 	   
-	   @PostMapping("/signup/{role}/googleId")
-	    public ResponseEntity<?> googleSignIn(@PathVariable String role, @RequestBody Map<String, String> requestBody) {
-	        try {
-	            String idToken = requestBody.get("googleId");
-	            GoogleIdToken.Payload payload = GoogleAuthentication.verifyGoogleToken(idToken);
-	            
-	            if (payload == null) {
-	                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google Token");
-	            }
-	            
-	            String email = payload.getEmail();
-	            String googleId = payload.getSubject();
-	            
-	            // Now, handle logic based on the role
-	            if ("driver".equals(role)) {
-	                // Handle driver-specific logic (e.g., create or find driver)
-	                System.out.println("Driver email: " + email);
-	                // Implement driver registration logic here
-	            } else if ("passenger".equals(role)) {
-	                // Handle passenger-specific logic (e.g., create or find passenger)
-	                System.out.println("Passenger email: " + email);
-	                // Implement passenger registration logic here
-	            } else {
-	                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid role");
-	            }
+	@PostMapping("/signup/{role}/googleId")
+	public ResponseEntity<?> googleSignIn(@PathVariable String role, @RequestBody Map<String, String> requestBody, HttpSession session) {
+	    try {
+	        String idToken = requestBody.get("googleId");
+	        System.out.println("Received Google ID Token: " + idToken);
+	        System.out.println("Received Role: " + role);
 
-	            return ResponseEntity.ok(Collections.singletonMap("message", role + " Google Sign-In Successful"));
-	        } catch (Exception e) {
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Google Sign-In Failed: " + e.getMessage());
+	        // Validate the Google ID token
+	        if (idToken == null || idToken.isEmpty()) {
+	            System.out.println("Error: Missing or invalid Google ID token");
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing or invalid Google ID token");
 	        }
+
+	        // Verify the Google ID token
+	        GoogleIdToken.Payload payload = GoogleAuthentication.verifyGoogleToken(idToken);
+	        System.out.println("Google Token Verification Payload: " + payload);
+
+	        if (payload == null) {
+	            System.out.println("Error: Invalid Google Token");
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google Token");
+	        }
+
+	        // Extract email and Google ID from the payload
+	        String email = payload.getEmail();
+	        String googleId = payload.getSubject();
+	        System.out.println("Extracted Email: " + email);
+	        System.out.println("Extracted Google ID: " + googleId);
+
+	        // Check if the role is 'driver'
+	        if ("driver".equals(role)) {
+	            Optional<Driver> existingDriver = driverServ.getDriverByEmail(email);
+	            System.out.println("Driver Lookup Result: " + existingDriver);
+
+	            if (existingDriver.isPresent()) {
+	                Driver driver = existingDriver.get();
+	                session.setAttribute("driverId", driver.getId());
+	                System.out.println("Driver Exists. ID: " + driver.getId());
+
+	                return ResponseEntity.ok(Map.of(
+	                    "exists", true,
+	                    "driverId", driver.getId(),
+	                    "message", "Driver found, proceed to home."
+	                ));
+	            } else {
+	                System.out.println("New Driver Detected. Redirecting to Registration.");
+
+	                return ResponseEntity.ok(Map.of(
+	                    "exists", false,
+	                    "message", "New driver, please proceed to registration."
+	                ));
+	            }
+	        }
+
+	        System.out.println("Error: Invalid role received - " + role);
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid role: " + role);
+
+	    } catch (IOException e) {
+	        System.out.println("Google Authentication Failed: " + e.getMessage());
+	        e.printStackTrace();  // Log full error details
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google authentication failed: " + e.getMessage());
+	    } catch (Exception e) {
+	        System.out.println("Unexpected Error: " + e.getMessage());
+	        e.printStackTrace();  // Log full error details
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Google Sign-In Failed: " + e.getMessage());
 	    }
+	}
+
+
+
+
+
+
+
+
+
+
 
 
 
