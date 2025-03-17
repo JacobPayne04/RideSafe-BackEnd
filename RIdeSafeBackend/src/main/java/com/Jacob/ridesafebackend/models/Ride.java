@@ -14,13 +14,23 @@ public class Ride {
 	
 	private String passengerId;
 	private String driverId;
+	private double passengerAmount;
 	
     // From Location (Pickup)
     private String fromLocation;
     private double fromLatitude;
     private double fromLongitude;
     
-    public double getFromLatitude() {
+    
+    public double getPassengerAmount() {
+		return passengerAmount;
+	}
+
+	public void setPassengerAmount(double passengerAmount) {
+		this.passengerAmount = passengerAmount;
+	}
+
+	public double getFromLatitude() {
 		return fromLatitude;
 	}
 
