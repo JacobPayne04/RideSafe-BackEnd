@@ -15,6 +15,7 @@ public class Ride {
 	private String passengerId;
 	private String driverId;
 	private double passengerAmount;
+	private boolean isPaid;
 	
     // From Location (Pickup)
     private String fromLocation;
