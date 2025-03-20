@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Jacob.ridesafebackend.service.PaymentService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
@@ -15,14 +16,18 @@ import com.stripe.net.Webhook;
 @RestController
 public class WebHookController {
 	
-	
-	
+		private final PaymentService paymentService;
+
+	    public WebHookController(PaymentService paymentService) {
+	        this.paymentService = paymentService;
+	    }
+
 
 	
 	private final String endpointSecret = "whsex_YOUR_WEBHOOK_SECRET";
 
 	//#TODO fix this webhook controller to trigger the other requirements such as updating database and triggering webhook
-	 @PostMapping("/stripe")
+	 @PostMapping("/stripe/paymentStatus")
 	    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload,
 	                                                      @RequestHeader("Stripe-Signature") String sigHeader) {
 	        Event event;
