@@ -14,7 +14,7 @@ import com.stripe.param.PaymentIntentCreateParams;
 public class PaymentService {
 		
 	
-		//TODO left off fix where this service file usees teh get methods from payment dto or ride dto the logic is there
+		//TODO add payment id into the payload IF needed
 	  public Map<String, String> createPaymentIntent(PaymentRequest paymentRequest) throws StripeException {
 	        int passengerCount = paymentRequest.getPassengerCount();
 	        int rate = paymentRequest.getRate();
@@ -37,5 +37,8 @@ public class PaymentService {
 
 	        return responseData;
 	    }		
+	  
+	  
+	  //#TODO service method for updating boolean status of ride to paid;
 
 }
