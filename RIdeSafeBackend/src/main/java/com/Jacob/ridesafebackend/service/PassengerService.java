@@ -45,7 +45,6 @@ public class PassengerService {
 		    }
 		    return Optional.of(passengers.get(0));
 		}
-		
 
 		// ✅ Used for regular (throws an error if not found)
 		public Passenger getPassenger(String email) {

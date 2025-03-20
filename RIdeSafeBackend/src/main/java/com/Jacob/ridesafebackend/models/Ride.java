@@ -15,21 +15,22 @@ public class Ride {
 	private String passengerId;
 	private String driverId;
 	private double passengerAmount;
-	private boolean isPaid;
+	private boolean isPaid = false;
+	private String paymentRequestRideId;
 	
-    public boolean isPaid() {
-		return isPaid;
-	}
-
-	public void setPaid(boolean isPaid) {
-		this.isPaid = isPaid;
-	}
-
+ 
 	// From Location (Pickup)
     private String fromLocation;
     private double fromLatitude;
     private double fromLongitude;
     
+    public boolean isPaid() {
+  		return isPaid;
+  	}
+
+  	public void setPaid(boolean isPaid) {
+  		this.isPaid = isPaid;
+  	}
     
     public double getPassengerAmount() {
 		return passengerAmount;
