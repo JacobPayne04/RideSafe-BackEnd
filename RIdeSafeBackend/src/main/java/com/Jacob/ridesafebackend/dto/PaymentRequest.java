@@ -3,12 +3,23 @@ package com.Jacob.ridesafebackend.dto;
 import org.springframework.data.annotation.Id;
 
 public class PaymentRequest {
+	
+	private String paymentRequestRideId;
+	
 	@Id
 	private int id;
 	private int passengerCount;
 	private int rate;
 
 	
+	public String getPaymentRequestRideId() {
+		return paymentRequestRideId;
+	}
+
+	public void setPaymentRequestRideId(String paymentRequestRideId) {
+		this.paymentRequestRideId = paymentRequestRideId;
+	}
+
 	public int getId() {
 		return id;
 	}

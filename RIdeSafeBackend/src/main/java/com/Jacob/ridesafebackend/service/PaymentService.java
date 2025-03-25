@@ -2,16 +2,27 @@ package com.Jacob.ridesafebackend.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.dto.PaymentRequest;
+import com.Jacob.ridesafebackend.models.Ride;
+import com.Jacob.ridesafebackend.repositorys.RideRepository;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
 @Service
 public class PaymentService {
+	
+	private final RideRepository rideRepo;
+	
+	
+	
+	public PaymentService(RideRepository riderepo) {
+		this.rideRepo = riderepo;
+	}
 		
 	
 		//TODO add payment id into the payload IF needed
@@ -40,5 +51,21 @@ public class PaymentService {
 	  
 	  
 	  //#TODO service method for updating boolean status of ride to paid;
+	 
+	  public Optional<Ride> updateRidePaymentStatus(String ridePaymentId) {
+
+		    Optional<Ride> optionalRide = rideRepo.findRideByIdAndPaid(ridePaymentId, false);
+
+		    if (optionalRide.isEmpty()) {
+		        // No unpaid ride found with this id
+		        return Optional.empty();
+		    }
+
+		    Ride ride = optionalRide.get();
+		    ride.setPaid(true);
+		    rideRepo.save(ride);
+
+		    return Optional.of(ride);
+		}
 
 }
