@@ -19,10 +19,20 @@ public class Ride {
 	private String paymentRequestRideId;
 	
  
+	
+
 	// From Location (Pickup)
     private String fromLocation;
     private double fromLatitude;
     private double fromLongitude;
+    
+    public String getPaymentRequestRideId() {
+		return paymentRequestRideId;
+	}
+
+	public void setPaymentRequestRideId(String paymentRequestRideId) {
+		this.paymentRequestRideId = paymentRequestRideId;
+	}
     
     public boolean isPaid() {
   		return isPaid;
