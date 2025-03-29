@@ -137,6 +137,15 @@ public class RideController {
 
 	    return ResponseEntity.ok(Map.of("message", "Ride payment updated successfully."));
 	}
+	
+	 @GetMapping("/details/{rideId}")
+    public ResponseEntity<Ride> getRideDetails(@PathVariable String rideId) {
+        Optional<Ride> rideOptional = rideServ.getRideById(rideId);
+        if (rideOptional.isPresent()) {
+            return ResponseEntity.ok(rideOptional.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Return 404 if ride not found
+    }
 
 
 }
