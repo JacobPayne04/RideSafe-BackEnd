@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Ride;
+import com.Jacob.ridesafebackend.repositorys.RideRepository;
 import com.Jacob.ridesafebackend.service.RideService;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -29,11 +30,13 @@ public class RideController {
 
 	@Autowired
 	private final RideService rideServ; // Using rideServ for the variable name
+	private final RideRepository rideRepo;
 
 	// Constructor for dependency injection
-	public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate) {
+	public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate, RideRepository rideRepo) {
 		this.rideServ = rideServ;
 		this.messagingTemplate = messagingTemplate;
+		this.rideRepo = rideRepo;
 	}
 
 	@PostMapping("/rides/save")
@@ -118,5 +121,22 @@ public class RideController {
 		String googleMapsUrl = rideServ.getGoogleMapsUrl(id);
 		return ResponseEntity.ok(Map.of("googleMapsUrl", googleMapsUrl));
 	}
+	
+	@PostMapping("/update-ride-payment")
+	public ResponseEntity<?> updateRidePayment(@RequestBody Map<String, String> payload) {
+	    String rideId = payload.get("rideId");
+	    
+	    Optional<Ride> rideOptional = rideRepo.findById(rideId);
+	    if (rideOptional.isEmpty()) {
+	        return ResponseEntity.status(404).body(Map.of("error", "Ride not found."));
+	    }
+
+	    Ride ride = rideOptional.get();
+	    ride.setPaid(true);
+	    rideRepo.save(ride);
+
+	    return ResponseEntity.ok(Map.of("message", "Ride payment updated successfully."));
+	}
+
 
 }
