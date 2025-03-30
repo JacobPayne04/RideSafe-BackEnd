@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.service.PaymentService;
-import com.google.api.client.util.Value;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
@@ -25,8 +27,9 @@ public class WebHookController {
 	    }
 	    
 
-	    @Value("${stripe.webhook.secret:${STRIPE_WEBHOOK_SECRET}}")
+	    @Value("${stripe.webhook.secret}")
 	    private String endpointSecret;
+
 	
 	    @PostMapping("/stripe/paymentStatus")
 	    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload,
