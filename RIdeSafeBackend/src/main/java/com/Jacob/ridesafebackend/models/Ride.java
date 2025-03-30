@@ -17,6 +17,7 @@ public class Ride {
 	private double passengerAmount;
 	private boolean isPaid = false;
 	private String paymentRequestRideId;
+	private int rate;
 	
  
 	
@@ -34,7 +35,15 @@ public class Ride {
 		this.paymentRequestRideId = paymentRequestRideId;
 	}
     
-    public boolean isPaid() {
+    public int getRate() {
+		return rate;
+	}
+
+	public void setRate(int rate) {
+		this.rate = rate;
+	}
+
+	public boolean isPaid() {
   		return isPaid;
   	}
 
