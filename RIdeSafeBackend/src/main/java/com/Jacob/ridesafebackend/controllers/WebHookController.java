@@ -62,7 +62,7 @@ public class WebHookController {
 	                    System.out.println("🛻 rideId from metadata: " + rideId);
 
 	                    if (rideId != null) {
-	                        paymentService.updateRidePaymentStatus(rideId)
+	                        paymentService.updateRidePaymentAmount(rideId)
 	                                .ifPresentOrElse(
 	                                        ride -> System.out.println("✅ Ride " + ride.getId() + " marked as PAID."),
 	                                        () -> System.out.println("⚠️ No unpaid ride found for rideId: " + rideId)
