@@ -12,6 +12,7 @@ import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.models.Ride.RideStatus;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
 
+
 @Service
 public class RideService {
 	// Connects server to repository
@@ -122,3 +123,4 @@ public class RideService {
 	
 
 }
+
