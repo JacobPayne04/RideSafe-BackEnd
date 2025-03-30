@@ -19,52 +19,41 @@ public class PaymentService {
 	
 	private final RideRepository rideRepo;
 	
-	
-	
 	public PaymentService(RideRepository riderepo) {
 		this.rideRepo = riderepo;
 	}
 		
-	
-	//TODO add payment id into the payload IF needed
-	  public Map<String, String> createPaymentIntent(PaymentRequest paymentRequest) throws StripeException {
-	        int passengerCount = paymentRequest.getPassengerCount();
-	        int rate = paymentRequest.getRate();
+	// Create payment intent
+	public Map<String, String> createPaymentIntent(Ride ride) throws StripeException {
+	    // Get the rate (cost of the ride) from the Ride object
+	    int rideAmount = ride.getRate();  // The rate is the cost of the ride in dollars
 
-	        // Secure the rate in backend (optional)
-	        // int rate = fetchRateForDriver(paymentRequest.getDriverId());
+	    // Convert the rideAmount (rate) from dollars to cents
+	    long amountInCents = rideAmount * 100;  // Stripe expects the amount in cents
 
-	        // Calculate total in cents
-	        int amount = passengerCount * rate * 100;
+	    // Create the PaymentIntent with the total cost (in cents)
+	    PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+	            .setAmount(amountInCents)  // Use the ride amount in cents
+	            .setCurrency("usd")  // Set the currency to USD
+	            .build();
 
-	        PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-	                .setAmount((long) amount)
-	                .setCurrency("usd") // or another currency
-	                .build();
+	    // Create the PaymentIntent using Stripe API
+	    PaymentIntent paymentIntent = PaymentIntent.create(params);
 
-	        PaymentIntent paymentIntent = PaymentIntent.create(params);
+	    // Prepare the response with the client secret for the frontend to use
+	    Map<String, String> responseData = new HashMap<>();
+	    responseData.put("clientSecret", paymentIntent.getClientSecret());
 
-	        Map<String, String> responseData = new HashMap<>();
-	        responseData.put("clientSecret", paymentIntent.getClientSecret());
+	    return responseData;
+	}
+		
 
-	        return responseData;
-	    }		
-	  
-	  //#TODO service method for updating boolean status of ride to paid;
-	 
-	  public Optional<Ride> updateRidePaymentStatus(String ridePaymentId) {
-
-		    Optional<Ride> optionalRide = rideRepo.findRideByIdAndPaid(ridePaymentId, false);
-
-		    if (optionalRide.isEmpty()) {
-		        // No unpaid ride found with this id
-		        return Optional.empty();
-		    }
-
-		    Ride ride = optionalRide.get();
-		    ride.setPaid(true);
-		    rideRepo.save(ride);
-
-		    return Optional.of(ride);
-		}
+	// Update ride payment status
+	public Optional<Ride> updateRidePaymentAmount(String ridePaymentId) {
+	    return rideRepo.findRideByIdAndPaid(ridePaymentId, false).map(ride -> {
+	        ride.setPaid(true);
+	        rideRepo.save(ride);
+	        return ride;
+	    });
+	}
 }
