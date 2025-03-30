@@ -20,9 +20,6 @@ public class PaymentController {
 	@PostMapping("/create-Payment-Intent")
 	public ResponseEntity<?> createPaymentIntent(@RequestBody PaymentRequest paymentRequest) {
 		
-		int passengerCount = paymentRequest.getPassengerCount();
-		int rate = paymentRequest.getRate();
-		
 		try {
 			
 			Map<String,String> clientSecretResponse = paymentServ.createPaymentIntent(paymentRequest);

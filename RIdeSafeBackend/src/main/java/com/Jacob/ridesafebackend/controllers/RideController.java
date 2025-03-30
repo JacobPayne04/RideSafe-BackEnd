@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Ride;
+import com.Jacob.ridesafebackend.repositorys.RideRepository;
 import com.Jacob.ridesafebackend.service.RideService;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -29,37 +30,29 @@ public class RideController {
 
 	@Autowired
 	private final RideService rideServ; // Using rideServ for the variable name
+	private final RideRepository rideRepo;
 
 	// Constructor for dependency injection
-	public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate) {
+	public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate, RideRepository rideRepo) {
 		this.rideServ = rideServ;
 		this.messagingTemplate = messagingTemplate;
+		this.rideRepo = rideRepo;
 	}
 
 	@PostMapping("/rides/save")
-	public ResponseEntity<String> saveRide(@RequestBody Ride ride) {
-		Ride savedRide = rideServ.saveRide(ride); // Using rideServ consistently
-		System.out.println("Notification sent to /topic/driver/" + savedRide.getDriverId());
+	public ResponseEntity<Map<String, Object>> saveRide(@RequestBody Ride ride) {
+	    Ride savedRide = rideServ.saveRide(ride);
 
-		Map<String, Object> notification = new HashMap<>();
-		notification.put("message", "New ride request from passenger.");
-		notification.put("passengerId", savedRide.getPassengerId());
-		notification.put("rideId", savedRide.getId());
-		notification.put("status", savedRide.getStatus());
-		notification.put("fromLocation", savedRide.getFromLocation());
-		notification.put("fromLatitude", savedRide.getFromLatitude());
-		notification.put("fromLongitude", savedRide.getFromLongitude());
-		notification.put("toLocation", savedRide.getToLocation());
-		notification.put("toLatitude", savedRide.getToLatitude());
-		notification.put("toLongitude", savedRide.getToLongitude());
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", "Ride scheduled successfully");
+	    response.put("rideId", savedRide.getId());
+	    response.put("passengerAmount", savedRide.getPassengerAmount());
+	    
+	  //##TODO this we need await conformation to call upon the payment trigger for the backend *****current thoughts is i dont know how exactly yet to connet teh webesock trigger to teh payment frono end so no we need to add a wawait acll back adn upon the success it triggers a fornt end to route to the pay page and then the pag pag will render teh othetr 
 
-		messagingTemplate.convertAndSend("/topic/driver/" + savedRide.getDriverId(), notification);
-		//##TODO this we need await conformation to call upon the payment trigger for the backend *****current thoughts is i dont know how exactly yet to connet teh webesock trigger to teh payment frono end so no we need to add a wawait acll back adn upon the success it triggers a fornt end to route to the pay page and then the pag pag will render teh othetr 
-		
-
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body("Ride scheduled successfully with ID: " + savedRide.getId());
+	    return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
+
 
 	// Get ride by Id
 	@GetMapping("/ride/{id}")
@@ -128,5 +121,31 @@ public class RideController {
 		String googleMapsUrl = rideServ.getGoogleMapsUrl(id);
 		return ResponseEntity.ok(Map.of("googleMapsUrl", googleMapsUrl));
 	}
+	
+	@PostMapping("/update-ride-payment")
+	public ResponseEntity<?> updateRidePayment(@RequestBody Map<String, String> payload) {
+	    String rideId = payload.get("rideId");
+	    
+	    Optional<Ride> rideOptional = rideRepo.findById(rideId);
+	    if (rideOptional.isEmpty()) {
+	        return ResponseEntity.status(404).body(Map.of("error", "Ride not found."));
+	    }
+
+	    Ride ride = rideOptional.get();
+	    ride.setPaid(true);
+	    rideRepo.save(ride);
+
+	    return ResponseEntity.ok(Map.of("message", "Ride payment updated successfully."));
+	}
+	
+	 @GetMapping("/details/{rideId}")
+    public ResponseEntity<Ride> getRideDetails(@PathVariable String rideId) {
+        Optional<Ride> rideOptional = rideServ.getRideById(rideId);
+        if (rideOptional.isPresent()) {
+            return ResponseEntity.ok(rideOptional.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Return 404 if ride not found
+    }
+
 
 }

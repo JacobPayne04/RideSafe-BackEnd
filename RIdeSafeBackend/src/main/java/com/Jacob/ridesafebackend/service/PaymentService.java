@@ -13,6 +13,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
+
 @Service
 public class PaymentService {
 	
@@ -66,5 +67,4 @@ public class PaymentService {
 
 		    return Optional.of(ride);
 		}
-
 }
