@@ -86,5 +86,44 @@ public class DriverService {
 		return driverRepo.findDriverByGoogleId(googleId);
 	}
 
+	public Driver updateDriver(String id, Driver updatedDriver) {
+		Driver existingDriver = driverRepo.findById(id)
+		        .orElseThrow(() -> new RuntimeException("Driver not found with ID: " + id));
+
+		    // Update fields if new values are provided
+		    if (updatedDriver.getFirstName() != null && !updatedDriver.getFirstName().isEmpty()) {
+		        existingDriver.setFirstName(updatedDriver.getFirstName());
+		    }
+		    
+		    if (updatedDriver.getLastName() != null && !updatedDriver.getLastName().isEmpty()) {
+		        existingDriver.setLastName(updatedDriver.getLastName());
+		    }
+		    
+		    if (updatedDriver.getEmail() != null && !updatedDriver.getEmail().isEmpty()) {
+		        existingDriver.setEmail(updatedDriver.getEmail());
+		    }
+
+		    if (updatedDriver.getLicensePlate() != null && !updatedDriver.getLicensePlate().isEmpty()) {
+		        existingDriver.setLicensePlate(updatedDriver.getLicensePlate());
+		    }
+
+		    if (updatedDriver.getGoogleId() != null && !updatedDriver.getGoogleId().isEmpty()) {
+		        existingDriver.setGoogleId(updatedDriver.getGoogleId());
+		    }
+
+		    if (updatedDriver.getDriverRate() > 0) {
+		        existingDriver.setDriverRate(updatedDriver.getDriverRate());
+		    }
+
+		    // Update password only if a new password is provided
+		    if (updatedDriver.getPassword() != null && !updatedDriver.getPassword().isEmpty()) {
+		        String hashed = BCrypt.hashpw(updatedDriver.getPassword(), BCrypt.gensalt());
+		        existingDriver.setPassword(hashed);
+		    }
+
+		    return driverRepo.save(existingDriver);
+	}
+
+
 
 }
