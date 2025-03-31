@@ -4,14 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.Jacob.ridesafebackend.dto.PaymentRequest;
 import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
+import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
+
+import jakarta.annotation.PostConstruct;
 
 
 @Service
@@ -19,16 +23,27 @@ public class PaymentService {
 	
 	private final RideRepository rideRepo;
 	
+	
+	
+	@Value("${stripe.secret.key}")
+	private String stripeSecretKey;
+	
 	public PaymentService(RideRepository riderepo) {
 		this.rideRepo = riderepo;
 	}
 		
+	 @PostConstruct
+	    public void init() {
+	        Stripe.apiKey = stripeSecretKey;
+	    }
 	// Create payment intent
 	public Map<String, String> createPaymentIntent(Ride ride) throws StripeException {
+		  
+		
 	    // Get the rate (cost of the ride) from the Ride object
 	    int rideAmount = ride.getRate();  // The rate is the cost of the ride in dollars
 
-	    // Convert the rideAmount (rate) from dollars to cents
+	    // Convert the rideAmounat (rate) from dollars to cents
 	    long amountInCents = rideAmount * 100;  // Stripe expects the amount in cents
 
 	    // Create the PaymentIntent with the total cost (in cents)
