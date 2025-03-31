@@ -17,6 +17,8 @@ public class Driver {
 	
 	private boolean isOnline;
 	
+	private int DriverRate;
+	
 	@NotEmpty(message = "First name is required!")
 	@Size(min = 3,max = 15,message = "First name must be between 3 and 15 characters")
 	private String firstName;
@@ -45,6 +47,18 @@ public class Driver {
 	
 	private String googleId; 
 	
+
+	public int getDriverRate() {
+		return DriverRate;
+	}
+
+	public void setDriverRate(int driverRate) {
+		DriverRate = driverRate;
+	}
+
+	public void setOnline(boolean isOnline) {
+		this.isOnline = isOnline;
+	}
 
 	public String getGoogleId() {
 		return googleId;

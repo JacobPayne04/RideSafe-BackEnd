@@ -105,8 +105,12 @@ public class DriverController {
 		return ResponseEntity.ok(onlineDrivers);
 
 	}
-
-
+	
+	@PutMapping("/edit/driver/{id}")
+	public ResponseEntity<Driver> updateDriver(@PathVariable String id, @RequestBody Driver updatedDriver) {
+	    Driver driver = driverServ.updateDriver(id, updatedDriver);
+	    return ResponseEntity.ok(driver);
+	}
 	   
 	@PostMapping("/signup/{role}/googleId")
 	public ResponseEntity<?> googleSignIn(@PathVariable String role, @RequestBody Map<String, String> requestBody, HttpSession session) {
