@@ -47,11 +47,20 @@ public class RideController {
 	    response.put("message", "Ride scheduled successfully");
 	    response.put("rideId", savedRide.getId());
 	    response.put("passengerAmount", savedRide.getPassengerAmount());
-	    
-	  //##TODO this we need await conformation to call upon the payment trigger for the backend *****current thoughts is i dont know how exactly yet to connet teh webesock trigger to teh payment frono end so no we need to add a wawait acll back adn upon the success it triggers a fornt end to route to the pay page and then the pag pag will render teh othetr 
+
+	    // Notify the driver via WebSocket
+	    if (savedRide.getDriverId() != null) {
+	        String driverDestination = "/topic/driver/" + savedRide.getDriverId(); // WebSocket destination
+	        Map<String, Object> notification = new HashMap<>();
+	        notification.put("title", "New Ride Request");
+	        notification.put("message", "A new passenger has booked a ride.");
+	        notification.put("rideId", savedRide.getId());
+	        messagingTemplate.convertAndSend(driverDestination, notification);
+	    }
 
 	    return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
+
 
 
 	// Get ride by Id
