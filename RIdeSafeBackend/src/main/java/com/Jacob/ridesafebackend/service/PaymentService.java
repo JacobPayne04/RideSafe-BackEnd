@@ -37,33 +37,29 @@ public class PaymentService {
 	        Stripe.apiKey = stripeSecretKey;
 	    }
 	// Create payment intent
-	public Map<String, String> createPaymentIntent(Ride ride) throws StripeException {
-		  
-		
-	    // Get the rate (cost of the ride) from the Ride object
-	    int rideAmount = ride.getRate();  // The rate is the cost of the ride in dollars
+	 public Map<String, String> createPaymentIntent(Ride ride) throws StripeException {
+		    int rideAmount = ride.getRate();
+		    long amountInCents = rideAmount * 100;
 
-	    // Convert the rideAmounat (rate) from dollars to cents
-	    long amountInCents = rideAmount * 100;  // Stripe expects the amount in cents
-	    
-	    System.out.print("Creating Payment with amount: " + amountInCents);
+		    PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+		            .setAmount(amountInCents)
+		            .setCurrency("usd")
+		            .build();
 
-	    // Create the PaymentIntent with the total cost (in cents)
-	    PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-	            .setAmount(amountInCents)  // Use the ride amount in cents
-	            .setCurrency("usd")  // Set the currency to USD
-	            .build();
+		    PaymentIntent paymentIntent = PaymentIntent.create(params);
 
-	    // Create the PaymentIntent using Stripe API
-	    PaymentIntent paymentIntent = PaymentIntent.create(params);
+		    // Log the PaymentIntent ID and clientSecret before returning
+		    System.out.println("PaymentIntent ID: " + paymentIntent.getId());
+		    System.out.println("Client Secret: " + paymentIntent.getClientSecret());
 
-	    // Prepare the response with the client secret for the frontend to use
-	    Map<String, String> responseData = new HashMap<>();
-	    System.out.println("Payment Intent created with client secret: " + paymentIntent.getClientSecret());  // Add this line
-	    responseData.put("clientSecret", paymentIntent.getClientSecret());
+		    Map<String, String> responseData = new HashMap<>();
+		    responseData.put("clientSecret", paymentIntent.getClientSecret());
+		    responseData.put("paymentIntentId", paymentIntent.getId());
 
-	    return responseData;
-	}
+		    return responseData;
+		}
+
+
 		
 
 	// Update ride payment status
