@@ -45,6 +45,8 @@ public class PaymentService {
 
 	    // Convert the rideAmounat (rate) from dollars to cents
 	    long amountInCents = rideAmount * 100;  // Stripe expects the amount in cents
+	    
+	    System.out.print("Creating Payment with amount: " + amountInCents);
 
 	    // Create the PaymentIntent with the total cost (in cents)
 	    PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
@@ -57,6 +59,7 @@ public class PaymentService {
 
 	    // Prepare the response with the client secret for the frontend to use
 	    Map<String, String> responseData = new HashMap<>();
+	    System.out.println("Payment Intent created with client secret: " + paymentIntent.getClientSecret());  // Add this line
 	    responseData.put("clientSecret", paymentIntent.getClientSecret());
 
 	    return responseData;
