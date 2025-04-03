@@ -35,6 +35,12 @@ public class RideService {
 	public Optional<Ride> getRideById(String id) {
 		return rideRepo.findById(id);
 	}
+	
+	public Optional<String> getDriverIdByRideId(String rideId) {
+	    Optional<Ride> rideOptional = rideRepo.findById(rideId);
+	    return rideOptional.map(Ride::getDriverId);
+	}
+
 
 	public void updateRideStatus(String id, RideStatus status) { // #TODO Make this update ride for ONGOING
 		Ride ride = rideRepo.findById(id).orElseThrow(() -> new RuntimeException("Ride not found"));
