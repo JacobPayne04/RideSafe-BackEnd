@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
+import com.Jacob.ridesafebackend.service.PaymentService;
 import com.Jacob.ridesafebackend.service.RideService;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -31,12 +32,14 @@ public class RideController {
 	@Autowired
 	private final RideService rideServ; // Using rideServ for the variable name
 	private final RideRepository rideRepo;
+	private final PaymentService paymentServ;
 
 	// Constructor for dependency injection
-	public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate, RideRepository rideRepo) {
+	public RideController(RideService rideServ, SimpMessagingTemplate messagingTemplate, RideRepository rideRepo, PaymentService paymentServ) {
 		this.rideServ = rideServ;
 		this.messagingTemplate = messagingTemplate;
 		this.rideRepo = rideRepo;
+		this.paymentServ = paymentServ;
 	}
 
 	@PostMapping("/rides/save")
@@ -134,18 +137,29 @@ public class RideController {
 	@PostMapping("/update-ride-payment")
 	public ResponseEntity<?> updateRidePayment(@RequestBody Map<String, String> payload) {
 	    String rideId = payload.get("rideId");
-	    
-	    Optional<Ride> rideOptional = rideRepo.findById(rideId);
-	    if (rideOptional.isEmpty()) {
-	        return ResponseEntity.status(404).body(Map.of("error", "Ride not found."));
+
+	    if (rideId == null || rideId.trim().isEmpty()) {
+	        return ResponseEntity.badRequest().body(Map.of("error", "Ride ID is required."));
 	    }
 
-	    Ride ride = rideOptional.get();
-	    ride.setPaid(true);
-	    rideRepo.save(ride);
+	    Optional<Ride> updatedRide = paymentServ.updateRidePaymentAmount(rideId);
 
-	    return ResponseEntity.ok(Map.of("message", "Ride payment updated successfully."));
+	    if (updatedRide.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Ride not found or already paid."));
+	    }
+
+	    Ride ride = updatedRide.get();
+
+	    // Include driverId in the response if available
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", "Ride payment updated successfully.");
+	    response.put("rideId", ride.getId());
+	    response.put("driverId", ride.getDriverId());
+
+	    return ResponseEntity.ok(response);
 	}
+
+
 	
 	 @GetMapping("/details/{rideId}")
     public ResponseEntity<Ride> getRideDetails(@PathVariable String rideId) {
