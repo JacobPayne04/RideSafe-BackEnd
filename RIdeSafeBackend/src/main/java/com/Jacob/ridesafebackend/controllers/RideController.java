@@ -49,14 +49,7 @@ public class RideController {
 	    response.put("passengerAmount", savedRide.getPassengerAmount());
 
 	    // Notify the driver via WebSocket
-	    if (savedRide.getDriverId() != null) {
-	        String driverDestination = "/topic/driver/" + savedRide.getDriverId(); // WebSocket destination
-	        Map<String, Object> notification = new HashMap<>();
-	        notification.put("title", "New Ride Request");
-	        notification.put("message", "A new passenger has booked a ride.");
-	        notification.put("rideId", savedRide.getId());
-	        messagingTemplate.convertAndSend(driverDestination, notification);
-	    }
+	    
 
 	    return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}

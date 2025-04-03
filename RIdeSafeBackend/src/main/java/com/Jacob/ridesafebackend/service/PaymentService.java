@@ -6,6 +6,7 @@ import java.util.Optional;
 
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.models.Ride;
@@ -20,6 +21,7 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 public class PaymentService {
+	private final SimpMessagingTemplate messagingTemplate;
 	
 	private final RideRepository rideRepo;
 	
@@ -28,8 +30,9 @@ public class PaymentService {
 	@Value("${stripe.secret.key}")
 	private String stripeSecretKey;
 	
-	public PaymentService(RideRepository riderepo) {
+	public PaymentService(RideRepository riderepo,SimpMessagingTemplate messagingTemplate) {
 		this.rideRepo = riderepo;
+		this.messagingTemplate = messagingTemplate;
 	}
 		
 	 @PostConstruct
@@ -67,6 +70,13 @@ public class PaymentService {
 	    return rideRepo.findRideByIdAndPaid(ridePaymentId, false).map(ride -> {
 	        ride.setPaid(true);
 	        rideRepo.save(ride);
+	        String driverDestination = "/topic/driver/" + ride.getDriverId(); // WebSocket destination
+	        Map<String, Object> notification = new HashMap<>();
+	        notification.put("title", "New Ride Request");
+	        notification.put("message", "A new passenger has booked a ride.");
+	        notification.put("rideId", ride.getId());
+	        messagingTemplate.convertAndSend(driverDestination, notification);
+	        System.out.println(ride.getId() +  " " + ride.getDriverId()+ " ");
 	        return ride;
 	    });
 	}
