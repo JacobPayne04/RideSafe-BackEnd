@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.models.Ride;
@@ -22,14 +22,18 @@ import jakarta.annotation.PostConstruct;
 public class PaymentService {
 	
 	private final RideRepository rideRepo;
+	private final SimpMessagingTemplate messagingTemplate;
+	private final RideService rideServ;
 	
 	
 	
 	@Value("${stripe.secret.key}")
 	private String stripeSecretKey;
 	
-	public PaymentService(RideRepository riderepo) {
+	public PaymentService(RideRepository riderepo, SimpMessagingTemplate messagingTemplate, RideService rideServ) {
 		this.rideRepo = riderepo;
+		this.messagingTemplate = messagingTemplate;
+		this.rideServ = rideServ;
 	}
 		
 	 @PostConstruct
@@ -63,11 +67,45 @@ public class PaymentService {
 		
 
 	// Update ride payment status
-	public Optional<Ride> updateRidePaymentAmount(String ridePaymentId) {
-	    return rideRepo.findRideByIdAndPaid(ridePaymentId, false).map(ride -> {
-	        ride.setPaid(true);
-	        rideRepo.save(ride);
-	        return ride;
-	    });
-	}
+	 public Optional<Ride> updateRidePaymentAmount(String rideId) {
+		    try {
+		        Optional<Ride> rideOptional = rideRepo.findById(rideId);
+
+		        if (rideOptional.isEmpty()) {
+		            System.out.println("Ride not found: " + rideId);
+		            return Optional.empty();
+		        }
+
+		        Ride ride = rideOptional.get();
+
+		        if (ride.isPaid()) {
+		            System.out.println("Ride is already marked as paid: " + rideId);
+		            return Optional.empty();
+		        }
+
+		        ride.setPaid(true);
+		        rideRepo.save(ride);
+
+		        Optional<String> driverIdOptional = rideServ.getDriverIdByRideId(rideId);
+		        driverIdOptional.ifPresent(driverId -> {
+		            String driverDestination = "/topic/driver/" + driverId;
+		            Map<String, Object> notification = new HashMap<>();
+		            notification.put("title", "Ride Payment Received");
+		            notification.put("message", "A passenger has paid for the ride.");
+		            notification.put("rideId", ride.getId());
+
+		            messagingTemplate.convertAndSend(driverDestination, notification);
+		            System.out.println("Sent WebSocket message to driver: " + driverId);
+		        });
+
+		        return Optional.of(ride);
+		    } catch (Exception e) {
+		        System.err.println("Error updating ride payment: " + e.getMessage());
+		        e.printStackTrace();
+		        return Optional.empty();
+		    }
+		}
+
+
+
 }
