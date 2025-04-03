@@ -20,6 +20,7 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 public class PaymentService {
+	private final SimpMessagingTemplate messagingTemplate;
 	
 	private final RideRepository rideRepo;
 	private final SimpMessagingTemplate messagingTemplate;
@@ -30,6 +31,7 @@ public class PaymentService {
 	@Value("${stripe.secret.key}")
 	private String stripeSecretKey;
 	
+
 	public PaymentService(RideRepository riderepo, SimpMessagingTemplate messagingTemplate, RideService rideServ) {
 		this.rideRepo = riderepo;
 		this.messagingTemplate = messagingTemplate;
@@ -64,9 +66,6 @@ public class PaymentService {
 		}
 
 
-		
-
-	// Update ride payment status
 	 public Optional<Ride> updateRidePaymentAmount(String rideId) {
 		    try {
 		        Optional<Ride> rideOptional = rideRepo.findById(rideId);
@@ -105,7 +104,4 @@ public class PaymentService {
 		        return Optional.empty();
 		    }
 		}
-
-
-
 }
