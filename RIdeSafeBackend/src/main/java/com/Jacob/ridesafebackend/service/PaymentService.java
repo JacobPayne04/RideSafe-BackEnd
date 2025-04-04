@@ -13,14 +13,16 @@ import com.Jacob.ridesafebackend.repositorys.RideRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.RefundCreateParams;
 
 import jakarta.annotation.PostConstruct;
 
 
 @Service
 public class PaymentService {
-	private final SimpMessagingTemplate messagingTemplate;
+	
 	
 	private final RideRepository rideRepo;
 	private final SimpMessagingTemplate messagingTemplate;
@@ -104,4 +106,56 @@ public class PaymentService {
 		        return Optional.empty();
 		    }
 		}
+	 
+	 
+	 public Optional<Ride> refundRide(String rideId) {
+		    try {
+		        Optional<Ride> rideOptional = rideRepo.findById(rideId);
+
+		        if (rideOptional.isEmpty()) {
+		            System.out.println("Ride not found: " + rideId);
+		            return Optional.empty();
+		        }
+
+		        Ride ride = rideOptional.get();
+
+		        if (!ride.isPaid()) {
+		            System.out.println("Ride is not paid: " + rideId);
+		            return Optional.empty();
+		        }
+
+		        String paymentIntentId = ride.getPaymentRequestRideId(); // Make sure you store this in your Ride model
+
+		        if (paymentIntentId == null || paymentIntentId.isEmpty()) {
+		            System.out.println("PaymentIntent ID is missing for ride: " + rideId);
+		            return Optional.empty();
+		        }
+
+		        // Step 1: Refund via Stripe
+		        RefundCreateParams params = RefundCreateParams.builder()
+		            .setPaymentIntent(paymentIntentId)
+		            .build();
+
+		        Refund refund = Refund.create(params);
+		        System.out.println("Refund issued: " + refund.getId());
+
+		        // Step 2: Update your app DB
+		        ride.setPaid(false);
+		        ride.setRefunded(true); // Optional: add this field if useful
+		        rideRepo.save(ride);
+
+		        return Optional.of(ride);
+
+		    } catch (StripeException e) {
+		        System.err.println("Stripe error during refund: " + e.getMessage());
+		        e.printStackTrace();
+		        return Optional.empty();
+		    } catch (Exception e) {
+		        System.err.println("Error processing refund: " + e.getMessage());
+		        e.printStackTrace();
+		        return Optional.empty();
+		    }
+		}
+	 
+	 
 }

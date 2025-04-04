@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,8 @@ import com.Jacob.ridesafebackend.models.Ride;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
 import com.Jacob.ridesafebackend.service.PaymentService;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Refund;
+import com.stripe.param.RefundCreateParams;
 
 @RestController
 public class PaymentController {
@@ -53,5 +56,25 @@ public class PaymentController {
         }
     }
 
+    
+    @PostMapping("/refund")
+    public ResponseEntity<?> refundPayment(@RequestBody Map<String, String> request) {
+        String paymentIntentId = request.get("paymentIntentId");
+
+        try {
+            // Create refund
+            RefundCreateParams params = RefundCreateParams.builder()
+                .setPaymentIntent(paymentIntentId)
+                .build();
+
+            Refund refund = Refund.create(params);
+
+            return ResponseEntity.ok(Map.of("message", "Refund successful", "refundId", refund.getId()));
+        } catch (StripeException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Refund failed: " + e.getMessage()));
+        }
+    }
 
 }
