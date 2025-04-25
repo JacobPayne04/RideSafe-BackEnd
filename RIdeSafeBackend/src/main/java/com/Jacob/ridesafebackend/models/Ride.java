@@ -16,6 +16,7 @@ public class Ride {
 	private String driverId;
 	private double passengerAmount;
 	private boolean isPaid = false;
+	private boolean isRefunded = false;
 	private String paymentRequestRideId;
 	private int rate;
 	
@@ -27,7 +28,16 @@ public class Ride {
     private double fromLatitude;
     private double fromLongitude;
     
-    public String getPaymentRequestRideId() {
+    
+    public boolean isRefunded() {
+		return isRefunded;
+	}
+
+	public void setRefunded(boolean isRefunded) {
+		this.isRefunded = isRefunded;
+	}
+
+	public String getPaymentRequestRideId() {
 		return paymentRequestRideId;
 	}
 
