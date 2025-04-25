@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.models.Driver;
@@ -72,9 +73,13 @@ public class DriverService {
 		return BCrypt.checkpw(rawPassword, hashedPassword);
 	}
 
-	public void updateStatus(String id, boolean isOnline) {
+	public void updateStatus(String id, boolean isOnline,Double longitude,Double latitude) {
 		Driver driver = driverRepo.findById(id).orElseThrow(() -> new RuntimeException("Driver not found"));
 		driver.setIsOnline(isOnline);
+		
+		if(isOnline && longitude != null && latitude != null) {
+			driver.setLocation(new GeoJsonPoint(longitude,latitude));
+		}
 		driverRepo.save(driver);
 	}
 
