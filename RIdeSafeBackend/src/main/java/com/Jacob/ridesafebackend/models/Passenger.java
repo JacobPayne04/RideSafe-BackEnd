@@ -1,5 +1,8 @@
 package com.Jacob.ridesafebackend.models;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.constraints.Email;
@@ -11,6 +14,9 @@ public class Passenger {
 	
 	@Id
     private String id;
+	
+	@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+	private GeoJsonPoint location;
     
     @NotEmpty(message = "First name is required!")
     @Size(min = 3,max = 15,message = "First name must be between 3 and 15 characters")
@@ -33,8 +39,17 @@ public class Passenger {
     private String confirm;
     
     private String googleId; 
+    
+    
+    public GeoJsonPoint getLocation() {
+		return location;
+	}
 
-    public String getGoogleId() {
+	public void setLocation(GeoJsonPoint location) {
+		this.location = location;
+	}
+
+	public String getGoogleId() {
 		return googleId;
 	}
 

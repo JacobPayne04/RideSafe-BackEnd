@@ -65,5 +65,14 @@ public class PassengerService {
 	    }
 
 		
+	    
+	    //new method to get passenger coordinates
+		public void updatePasengerStatus(String id, Double longitude, Double latitude) {
+			Passenger passenger = passengerRepo.findById(id).orElseThrow(()-> new RuntimeException("Passneger not found"));
+			
+			if(longitude != null & latitude != null) {
+				passengerRepo.save(passenger);
+			}
+		}
 		
 }
