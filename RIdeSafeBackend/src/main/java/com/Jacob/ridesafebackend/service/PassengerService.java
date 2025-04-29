@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
 
-import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.repositorys.PassengerRepository;
 
@@ -71,6 +71,7 @@ public class PassengerService {
 			Passenger passenger = passengerRepo.findById(id).orElseThrow(()-> new RuntimeException("Passneger not found"));
 			
 			if(longitude != null & latitude != null) {
+				passenger.setLocation(new GeoJsonPoint(longitude, latitude));  
 				passengerRepo.save(passenger);
 			}
 		}
