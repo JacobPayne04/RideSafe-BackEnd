@@ -93,7 +93,7 @@ public class DriverController {
 	public ResponseEntity<String> updateDriverStatus(@PathVariable("id") String id,
 			@RequestBody DriverStatusCoordinatesRequest request) {
 		driverServ.updateStatus(id, request.isOnline(), request.getLongitude(), request.getLatitude());
-		System.out.println("cordinates" + request);
+		System.out.println("Driver cordinates" + request);
 		return ResponseEntity.ok("Drive Status updated");
 	}
 
