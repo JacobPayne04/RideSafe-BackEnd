@@ -94,7 +94,7 @@ public class PassengerController {
 
 
 		//passenger coordiantes request
-	@PutMapping("{id}/stauts/passenger")
+	@PutMapping("/{id}/status/passenger")
 	public ResponseEntity<String> updatePassengerStatus(@PathVariable("id") String id, @RequestBody PassnegerStatusCoordiantesRequest request) {
 		passengerServ.updatePasengerStatus(id,request.getLongitude(),request.getLatitude());
 		System.out.println("Passneger Coordinate" + request);
