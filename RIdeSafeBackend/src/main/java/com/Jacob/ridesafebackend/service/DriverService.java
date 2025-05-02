@@ -76,7 +76,8 @@ public class DriverService {
 	public void updateStatus(String id, boolean isOnline,Double longitude,Double latitude) {
 		Driver driver = driverRepo.findById(id).orElseThrow(() -> new RuntimeException("Driver not found"));
 		driver.setIsOnline(isOnline);
-		
+		System.out.println("Saving driver with isOnline = " + driver.isOnline());
+
 		if(isOnline && longitude != null && latitude != null) {
 			driver.setLocation(new GeoJsonPoint(longitude,latitude));
 		}

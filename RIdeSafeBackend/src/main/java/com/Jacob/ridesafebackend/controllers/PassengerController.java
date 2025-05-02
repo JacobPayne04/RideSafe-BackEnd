@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Jacob.ridesafebackend.dto.PassnegerStatusCoordiantesRequest;
+import com.Jacob.ridesafebackend.dto.PassengerStatusCoordiantesRequest;
 import com.Jacob.ridesafebackend.models.LoginPassenger;
 import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
@@ -95,9 +95,9 @@ public class PassengerController {
 
 		//passenger coordiantes request
 	@PutMapping("/{id}/status/passenger")
-	public ResponseEntity<String> updatePassengerStatus(@PathVariable("id") String id, @RequestBody PassnegerStatusCoordiantesRequest request) {
+	public ResponseEntity<String> updatePassengerStatus(@PathVariable("id") String id, @RequestBody PassengerStatusCoordiantesRequest request) {
 		passengerServ.updatePasengerStatus(id,request.getLongitude(),request.getLatitude());
-		System.out.println("Passneger Coordinate" + request);
+		System.out.println("Passenger Coordinates" + request);
 		return ResponseEntity.ok("Passenger Status updated");
 	}
 	
