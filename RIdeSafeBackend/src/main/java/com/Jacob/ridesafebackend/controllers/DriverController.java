@@ -94,6 +94,8 @@ public class DriverController {
 			@RequestBody DriverStatusCoordinatesRequest request) {
 		driverServ.updateStatus(id, request.isOnline(), request.getLongitude(), request.getLatitude());
 		System.out.println("Driver cordinates" + request);
+		System.out.println("Received request: driver isOnline=" + request.isOnline() + ", lat=" + request.getLatitude());
+
 		return ResponseEntity.ok("Drive Status updated");
 	}
 
@@ -194,5 +196,6 @@ public class DriverController {
 					.body("Google Sign-In Failed: " + e.getMessage());
 		}
 	}
+	
 
 }

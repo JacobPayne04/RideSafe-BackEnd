@@ -1,17 +1,16 @@
 package com.Jacob.ridesafebackend.dto;
 
-public class DriverStatusCoordinatesRequest {
+public class PassengerStatusCoordiantesRequest {
 
-
-    private boolean isOnline;
+    private boolean isOnline;                      // ✅ correct field name
     private Double longitude;
-    private Double latitude;
+    private Double latitude;                       // ✅ lowercase
 
-    public boolean isOnline() {
+    public boolean isOnline() {                    // ✅ getter
         return isOnline;
     }
 
-    public void setIsOnline(boolean isOnline) {
+    public void setIsOnline(boolean isOnline) {    // ✅ MUST match field name for JSON binding
         this.isOnline = isOnline;
     }
 
