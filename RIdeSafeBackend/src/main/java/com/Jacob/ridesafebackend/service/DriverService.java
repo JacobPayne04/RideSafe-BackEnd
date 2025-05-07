@@ -91,6 +91,14 @@ public class DriverService {
 	public Optional<Driver> findDriverGoogleId(String googleId) {
 		return driverRepo.findDriverByGoogleId(googleId);
 	}
+	
+	public List<Driver> findNearbyDrivers(double latitude, double longitude) {
+	    return driverRepo.findDriversNearLocation(longitude, latitude); // ✅ correct order
+	}
+	
+	
+	
+	
 
 	public Driver updateDriver(String id, Driver updatedDriver) {
 		Driver existingDriver = driverRepo.findById(id)

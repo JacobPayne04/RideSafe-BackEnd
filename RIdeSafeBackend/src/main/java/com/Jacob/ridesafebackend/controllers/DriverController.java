@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.dto.DriverStatusCoordinatesRequest;
+import com.Jacob.ridesafebackend.dto.PassengerStatusCoordiantesRequest;
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.models.Passenger;
@@ -105,6 +106,16 @@ public class DriverController {
 		List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
 		return ResponseEntity.ok(onlineDrivers);
 
+	}
+	
+	//NEW METHOD for nearby drivers
+	@PostMapping("/nearby/drivers")
+	public ResponseEntity<List<Driver>> getNearbyDrivers(@RequestBody PassengerStatusCoordiantesRequest passengerStatusCoordinatesRequest) {
+	    double latitude = passengerStatusCoordinatesRequest.getLatitude();
+	    double longitude = passengerStatusCoordinatesRequest.getLongitude();
+
+	    List<Driver> nearbyDrivers = driverServ.findNearbyDrivers(latitude, longitude);
+	    return ResponseEntity.ok(nearbyDrivers);
 	}
 
 	@PutMapping("/edit/driver/{id}")
