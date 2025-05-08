@@ -1,11 +1,22 @@
 package com.Jacob.ridesafebackend.dto;
 
 public class DriverRequiredInformationDTO {
+	
 	 private String firstName;
 	    private String lastName;
 	    private String licensePlate;
 	    private boolean acceptedTerms;
 	    private String eSign;
+	    private String driverid;
+	    
+	    
+	    
+		public String getDriverid() {
+			return driverid;
+		}
+		public void setDriverid(String driverid) {
+			this.driverid = driverid;
+		}
 		public String getFirstName() {
 			return firstName;
 		}

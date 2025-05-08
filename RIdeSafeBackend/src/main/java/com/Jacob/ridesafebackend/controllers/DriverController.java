@@ -61,7 +61,14 @@ public class DriverController {
 			@RequestPart("dlFile") MultipartFile dlFile,
 		    @RequestPart("studentIdFile") MultipartFile studentIdFile){
 		
-		return null;
+			try {
+				//driverServ.processDriverRequiredInformationSignup(info, dlFile, studentIdFile);
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Driver application submitted successfully. " );
+			} catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("signup failed : " + e.getMessage());
+			}
+		
+	
 		
 	}
 	
