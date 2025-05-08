@@ -141,10 +141,6 @@ public class DriverService {
 	    return driverRepo.findDriversNearLocation(longitude, latitude); // ✅ correct order
 	}
 	
-	
-	
-	
-	
 
 	public Driver updateDriver(String id, Driver updatedDriver) {
 		Driver existingDriver = driverRepo.findById(id)
@@ -184,8 +180,6 @@ public class DriverService {
 		    return driverRepo.save(existingDriver);
 	}
 
-
-	
 	
 	private String saveFile(MultipartFile file) throws IOException {
 	    if (file == null || file.isEmpty()) {
