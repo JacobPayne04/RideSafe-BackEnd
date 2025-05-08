@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.Jacob.ridesafebackend.dto.DriverRequiredInformationDTO;
 import com.Jacob.ridesafebackend.dto.DriverStatusCoordinatesRequest;
 import com.Jacob.ridesafebackend.dto.PassengerStatusCoordiantesRequest;
 import com.Jacob.ridesafebackend.models.Driver;
@@ -51,6 +54,19 @@ public class DriverController {
 
 		return ResponseEntity.ok(creatDriver);
 	}
+	
+	//Start of implimenting new method 
+	@PostMapping("/Driver/complete/signup")
+	public ResponseEntity<?> SubmitDriverApplication( @RequestPart("info") DriverRequiredInformationDTO info,
+			@RequestPart("dlFile") MultipartFile dlFile,
+		    @RequestPart("studentIdFile") MultipartFile studentIdFile){
+		
+		return null;
+		
+	}
+	
+	
+	
 
 	// Current Driver in session route
 
