@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.Jacob.ridesafebackend.dto.DriverRequiredInformationDTO;
 import com.Jacob.ridesafebackend.dto.DriverStatusCoordinatesRequest;
+import com.Jacob.ridesafebackend.dto.PassengerStatusCoordiantesRequest;
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.models.Passenger;
@@ -50,6 +54,23 @@ public class DriverController {
 
 		return ResponseEntity.ok(creatDriver);
 	}
+	
+	//Start of implimenting new method 
+	@PostMapping("/Driver/complete/signup")
+	public ResponseEntity<?> SubmitDriverApplication( @RequestPart("info") DriverRequiredInformationDTO info,
+			@RequestPart("dlFile") MultipartFile dlFile,
+		    @RequestPart("studentIdFile") MultipartFile studentIdFile){
+		
+			try {
+				driverServ.processDriverRequiredInformationSignup(info, dlFile, studentIdFile);
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Driver application submitted successfully. " );
+			} catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("signup failed : " + e.getMessage());
+			}
+	}
+	
+	
+	
 
 	// Current Driver in session route
 
@@ -105,6 +126,16 @@ public class DriverController {
 		List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
 		return ResponseEntity.ok(onlineDrivers);
 
+	}
+	
+	//NEW METHOD for nearby drivers
+	@PostMapping("/nearby/drivers")
+	public ResponseEntity<List<Driver>> getNearbyDrivers(@RequestBody PassengerStatusCoordiantesRequest passengerStatusCoordinatesRequest) {
+	    double latitude = passengerStatusCoordinatesRequest.getLatitude();
+	    double longitude = passengerStatusCoordinatesRequest.getLongitude();
+
+	    List<Driver> nearbyDrivers = driverServ.findNearbyDrivers(latitude, longitude);
+	    return ResponseEntity.ok(nearbyDrivers);
 	}
 
 	@PutMapping("/edit/driver/{id}")

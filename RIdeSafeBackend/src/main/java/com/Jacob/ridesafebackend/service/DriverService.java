@@ -1,12 +1,19 @@
 package com.Jacob.ridesafebackend.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.Jacob.ridesafebackend.dto.DriverRequiredInformationDTO;
 import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.repositorys.DriverMongoRepository;
 import com.Jacob.ridesafebackend.repositorys.DriverRepository;
@@ -36,6 +43,44 @@ public class DriverService {
 
 		return driverRepo.save(driver);
 	}
+	
+	//TODO current method working on further driver sign up ##TODO test the method make front end ect
+	public void processDriverRequiredInformationSignup(
+		    DriverRequiredInformationDTO info,
+		    MultipartFile dlFile,
+		    MultipartFile studentIdFile
+		) throws IOException {
+		 	String driverId = info.getDriverid();
+		    Optional<Driver> optionalDriver = driverRepo.findById(driverId);
+		    if (optionalDriver.isEmpty()) {
+		        throw new RuntimeException("Driver not found");
+		    }
+
+		    Driver driver = optionalDriver.get();
+		   
+
+		    // If/when you're ready to implement saving files:
+		    String dlPath = saveFile(dlFile);
+		    String studentIdPath = saveFile(studentIdFile);
+		    
+		    driver.setDlFileUrl(dlPath);
+		    driver.setStudentIdFileUrl(studentIdPath);
+
+		    // Update driver fields
+		    driver.setFirstName(info.getFirstName());
+		    driver.setLastName(info.getLastName());
+		    driver.setLicensePlate(info.getLicensePlate());
+		    driver.setAcceptedTerms(info.isAcceptedTerms());
+		    driver.seteSign(info.geteSign());
+		    
+
+		    driver.setDlFileUrl(dlPath);              // ✅ save file URL/path
+		    driver.setStudentIdFileUrl(studentIdPath); // ✅ save file URL/path
+
+		    driverRepo.save(driver);
+		}
+	
+	
 
 	public List<Driver> getAllDrivers() {
 		return driverRepo.findAll();
@@ -91,6 +136,11 @@ public class DriverService {
 	public Optional<Driver> findDriverGoogleId(String googleId) {
 		return driverRepo.findDriverByGoogleId(googleId);
 	}
+	
+	public List<Driver> findNearbyDrivers(double latitude, double longitude) {
+	    return driverRepo.findDriversNearLocation(longitude, latitude); // ✅ correct order
+	}
+	
 
 	public Driver updateDriver(String id, Driver updatedDriver) {
 		Driver existingDriver = driverRepo.findById(id)
@@ -130,6 +180,20 @@ public class DriverService {
 		    return driverRepo.save(existingDriver);
 	}
 
+	
+	private String saveFile(MultipartFile file) throws IOException {
+	    if (file == null || file.isEmpty()) {
+	        throw new IOException("File is empty");
+	    }
 
+	    String uploadsDir = "uploads/";
+	    Files.createDirectories(Paths.get(uploadsDir));
+
+	    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+	    Path filePath = Paths.get(uploadsDir + fileName);
+	    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+	    return "/" + uploadsDir + fileName;
+	}
 
 }

@@ -19,11 +19,19 @@ public class Driver {
 	private String id;
 	
 	private boolean isOnline;
+	private boolean acceptedTerms;
+	private boolean isAllowedToDriver = true;
 	
 	private int DriverRate;
 	
 	@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
 	private GeoJsonPoint location;
+	
+	
+	private String dlFileUrl;
+	private String studentIdFileUrl;
+	private String eSign;
+	
 	
 	
 	@NotEmpty(message = "First name is required!")
@@ -50,10 +58,53 @@ public class Driver {
 	
 	@NotEmpty(message = "License plate is required!")
 	@Size(min = 5,max = 9,message = "License plate must be between 3 and 9 characters" )
+	
 	private String licensePlate;
 	
 	private String googleId; 
 	
+	
+	
+	public String geteSign() {
+		return eSign;
+	}
+
+	public void seteSign(String eSign) {
+		this.eSign = eSign;
+	}
+
+	public boolean isAcceptedTerms() {
+		return acceptedTerms;
+	}
+
+	public void setAcceptedTerms(boolean acceptedTerms) {
+		this.acceptedTerms = acceptedTerms;
+	}
+
+	public boolean isAllowedToDriver() {
+		return isAllowedToDriver;
+	}
+
+	public void setAllowedToDriver(boolean isAllowedToDriver) {
+		this.isAllowedToDriver = isAllowedToDriver;
+	}
+
+	public String getDlFileUrl() {
+		return dlFileUrl;
+	}
+
+	public void setDlFileUrl(String dlFileUrl) {
+		this.dlFileUrl = dlFileUrl;
+	}
+
+	public String getStudentIdFileUrl() {
+		return studentIdFileUrl;
+	}
+
+	public void setStudentIdFileUrl(String studentIdFileUrl) {
+		this.studentIdFileUrl = studentIdFileUrl;
+	}
+
 	public GeoJsonPoint getLocation() {
 		return location;
 	}
