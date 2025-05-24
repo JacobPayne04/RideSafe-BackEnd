@@ -26,6 +26,14 @@ public class Passenger {
     @Size(min = 3,max = 15,message = "Last name must be between 3 and 15 characters")
     private String lastName;
     
+    @NotEmpty(message = "Last name is required!")
+    @Size(min = 3,max = 15,message = "Last name must be between 3 and 15 characters")
+    private String VenmoUserName;
+    
+    @NotEmpty(message = "Last name is required!")
+    @Size(min = 3,max = 15,message = "Last name must be between 3 and 15 characters")
+    private String CashAppUserName;
+    
     @NotEmpty(message = "Email is required!")
 	@Email(message = "Please enter a valid email!")
 	 private String email;
@@ -47,6 +55,22 @@ public class Passenger {
 
 	public void setLocation(GeoJsonPoint location) {
 		this.location = location;
+	}
+
+	public String getVenmoUserName() {
+		return VenmoUserName;
+	}
+
+	public void setVenmoUserName(String venmoUserName) {
+		VenmoUserName = venmoUserName;
+	}
+
+	public String getCashAppUserName() {
+		return CashAppUserName;
+	}
+
+	public void setCashAppUserName(String cashAppUserName) {
+		CashAppUserName = cashAppUserName;
 	}
 
 	public String getGoogleId() {
