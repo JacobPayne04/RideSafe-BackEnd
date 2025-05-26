@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.service.DriverService;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import com.Jacob.ridesafebackend.service.PassengerService;
+import com.Jacob.ridesafebackend.service.PaymentService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import jakarta.servlet.http.HttpSession;
@@ -40,11 +42,13 @@ public class DriverController {
 	private final DriverService driverServ;
 	private final GoogleAuthentication GoogleAuth;
 	private final PassengerService passengerServ;
+	private final PaymentService paymentServ;
 
-	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ) {
+	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ,PaymentService paymentServ) {
 		this.driverServ = driverServ;
 		this.GoogleAuth = GoogleAuth;
 		this.passengerServ = passengerServ;
+		this.paymentServ = paymentServ;
 	}
 
 	@PostMapping("/new")
@@ -143,6 +147,27 @@ public class DriverController {
 		Driver driver = driverServ.updateDriver(id, updatedDriver);
 		return ResponseEntity.ok(driver);
 	}
+	
+	//new method********
+	@PostMapping("/Driver/stripe/signup")
+	public ResponseEntity<String> onboardDriver(@RequestParam String email) {
+	    try {
+	        System.out.println("🔁 Incoming request to onboard email: " + email);
+
+	        String link = paymentServ.onboardDriver(email); // ⚠️ error likely happens here
+
+	        System.out.println("✅ Generated Stripe onboarding link: " + link);
+	        return ResponseEntity.ok(link);
+
+	    } catch (Exception e) {
+	        System.out.println("❌ Stripe onboarding failed: " + e.getMessage());
+	        e.printStackTrace(); // 👈 shows the full error in your terminal
+	        return ResponseEntity.status(500).body("Error: " + e.getMessage());
+	    }
+	}
+
+	
+	
 
 	@PostMapping("/signup/{role}/googleId")
 	public ResponseEntity<?> googleSignIn(@PathVariable String role, @RequestBody Map<String, String> requestBody,

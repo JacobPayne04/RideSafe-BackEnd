@@ -8,12 +8,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.Jacob.ridesafebackend.models.Driver;
 import com.Jacob.ridesafebackend.models.Ride;
+import com.Jacob.ridesafebackend.repositorys.DriverRepository;
 import com.Jacob.ridesafebackend.repositorys.RideRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Account;
+import com.stripe.model.AccountLink;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
+import com.stripe.param.AccountCreateParams;
+import com.stripe.param.AccountLinkCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.RefundCreateParams;
 
@@ -23,7 +29,7 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class PaymentService {
 	
-	
+	private final DriverRepository driverRepo;
 	private final RideRepository rideRepo;
 	private final SimpMessagingTemplate messagingTemplate;
 	private final RideService rideServ;
@@ -34,7 +40,8 @@ public class PaymentService {
 	private String stripeSecretKey;
 	
 
-	public PaymentService(RideRepository riderepo, SimpMessagingTemplate messagingTemplate, RideService rideServ) {
+	public PaymentService(RideRepository riderepo, SimpMessagingTemplate messagingTemplate, RideService rideServ, DriverRepository driverrepo) {
+		this.driverRepo = driverrepo;
 		this.rideRepo = riderepo;
 		this.messagingTemplate = messagingTemplate;
 		this.rideServ = rideServ;
@@ -67,6 +74,41 @@ public class PaymentService {
 		    return responseData;
 		}
 
+	 	
+	 	public String onboardDriver(String email) throws Exception {
+	 		
+	 		AccountCreateParams accountParams = AccountCreateParams.builder()
+	 				.setType(AccountCreateParams.Type.EXPRESS)
+	 				.setEmail(email)
+	 				.setCountry("US")
+	 				.build();
+	 		
+	 		Account account = Account.create(accountParams);
+	 		
+	 		Optional<Driver> optionaldriver = driverRepo.findDriverByEmail(email);
+	 		
+	 		if(!optionaldriver.isPresent()) {
+	 		     throw new RuntimeException("Driver not found with email: " + email);
+	 		}
+	 		
+	 		Driver driver = optionaldriver.get();
+	 		
+	 		driver.setStripeAccountId(account.getId());
+	 		driverRepo.save(driver);
+	 				
+	 		AccountLinkCreateParams linkParams = AccountLinkCreateParams.builder()
+	 				.setAccount(driver.getStripeAccountId())
+	 				.setRefreshUrl("http://localhost:3000/signup") //need to change 
+	 				.setReturnUrl("http://localhost:3000/home/userID") //need to change
+	 				.setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
+	 				.build();
+	 		
+	 		AccountLink accountLink = AccountLink.create(linkParams);
+	 		
+	 		return accountLink.getUrl();
+	 	}			
+	 
+	 	
 
 	 public Optional<Ride> updateRidePaymentAmount(String rideId) {
 		    try {
