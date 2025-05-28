@@ -21,6 +21,8 @@ public interface DriverRepository extends MongoRepository<Driver,String>,CustomD
 	
 	
 	Optional<Driver> findDriverByEmail(String email);
+
+	List<Driver>findByIsAllowedToDriveFalse();
 }
 
 //Changed form extending crud repo to extending mongo 

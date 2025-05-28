@@ -22,7 +22,7 @@ public class Driver {
 	
 	private boolean isOnline;
 	private boolean acceptedTerms;
-	private boolean isAllowedToDriver = true;
+	private boolean isAllowedToDrive = false;
 	
 	private int DriverRate;
 	
@@ -92,11 +92,11 @@ public class Driver {
 	}
 
 	public boolean isAllowedToDriver() {
-		return isAllowedToDriver;
+		return isAllowedToDrive;
 	}
 
 	public void setAllowedToDriver(boolean isAllowedToDriver) {
-		this.isAllowedToDriver = isAllowedToDriver;
+		this.isAllowedToDrive = isAllowedToDriver;
 	}
 
 	public String getDlFileUrl() {
