@@ -20,7 +20,7 @@ public interface DriverRepository extends MongoRepository<Driver,String>,CustomD
 	Optional<Driver> findDriverByGoogleId(String googleId);
 	
 	
-
+	Optional<Driver> findDriverByEmail(String email);
 }
 
 //Changed form extending crud repo to extending mongo 

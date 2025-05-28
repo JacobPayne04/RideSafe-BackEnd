@@ -18,6 +18,8 @@ public class Driver {
 	@Id
 	private String id;
 	
+	private String stripeAccountId;
+	
 	private boolean isOnline;
 	private boolean acceptedTerms;
 	private boolean isAllowedToDriver = true;
@@ -65,6 +67,14 @@ public class Driver {
 	
 	
 	
+	public String getStripeAccountId() {
+		return stripeAccountId;
+	}
+
+	public void setStripeAccountId(String stripeAccountId) {
+		this.stripeAccountId = stripeAccountId;
+	}
+
 	public String geteSign() {
 		return eSign;
 	}
