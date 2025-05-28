@@ -51,153 +51,167 @@ public class PaymentService {
 	    public void init() {
 	        Stripe.apiKey = stripeSecretKey;
 	    }
-	// Create payment intent
+	 /**
+	  * Creates a Stripe PaymentIntent for a specific ride.
+	  * Converts the ride's rate to cents and returns client secret + intent ID.
+	  */
 	 public Map<String, String> createPaymentIntent(Ride ride) throws StripeException {
-		    int rideAmount = ride.getRate();
-		    long amountInCents = rideAmount * 100;
+	 	int rideAmount = ride.getRate();
+	 	long amountInCents = rideAmount * 100;
 
-		    PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-		            .setAmount(amountInCents)
-		            .setCurrency("usd")
-		            .build();
+	 	PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+	 			.setAmount(amountInCents)
+	 			.setCurrency("usd")
+	 			.build();
 
-		    PaymentIntent paymentIntent = PaymentIntent.create(params);
+	 	PaymentIntent paymentIntent = PaymentIntent.create(params);
 
-		    // Log the PaymentIntent ID and clientSecret before returning
-		    System.out.println("PaymentIntent ID: " + paymentIntent.getId());
-		    System.out.println("Client Secret: " + paymentIntent.getClientSecret());
+	 	System.out.println("PaymentIntent ID: " + paymentIntent.getId());
+	 	System.out.println("Client Secret: " + paymentIntent.getClientSecret());
 
-		    Map<String, String> responseData = new HashMap<>();
-		    responseData.put("clientSecret", paymentIntent.getClientSecret());
-		    responseData.put("paymentIntentId", paymentIntent.getId());
+	 	Map<String, String> responseData = new HashMap<>();
+	 	responseData.put("clientSecret", paymentIntent.getClientSecret());
+	 	responseData.put("paymentIntentId", paymentIntent.getId());
 
-		    return responseData;
-		}
+	 	return responseData;
+	 }
 
-	 	
-	 	public String onboardDriver(String email) throws Exception {
-	 		
-	 		AccountCreateParams accountParams = AccountCreateParams.builder()
-	 				.setType(AccountCreateParams.Type.EXPRESS)
-	 				.setEmail(email)
-	 				.setCountry("US")
-	 				.build();
-	 		
-	 		Account account = Account.create(accountParams);
-	 		
-	 		Optional<Driver> optionaldriver = driverRepo.findDriverByEmail(email);
-	 		
-	 		if(!optionaldriver.isPresent()) {
-	 		     throw new RuntimeException("Driver not found with email: " + email);
-	 		}
-	 		
-	 		Driver driver = optionaldriver.get();
-	 		
-	 		driver.setStripeAccountId(account.getId());
-	 		driverRepo.save(driver);
-	 				
-	 		AccountLinkCreateParams linkParams = AccountLinkCreateParams.builder()
-	 				.setAccount(driver.getStripeAccountId())
-	 				.setRefreshUrl("http://localhost:3000/signup") //need to change 
-	 				.setReturnUrl("http://localhost:3000/home/userID") //need to change
-	 				.setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
-	 				.build();
-	 		
-	 		AccountLink accountLink = AccountLink.create(linkParams);
-	 		
-	 		return accountLink.getUrl();
-	 	}			
-	 
-	 	
 
+	 /**
+	  * Starts Stripe Express on boarding for a driver using their email.
+	  * Saves the Stripe Account ID to the driver and returns the on boarding URL.
+	  */
+	 public String onboardDriver(String email) throws Exception {
+	 	AccountCreateParams accountParams = AccountCreateParams.builder()
+	 			.setType(AccountCreateParams.Type.EXPRESS)
+	 			.setEmail(email)
+	 			.setCountry("US")
+	 			.build();
+
+	 	Account account = Account.create(accountParams);
+
+	 	Optional<Driver> optionaldriver = driverRepo.findDriverByEmail(email);
+
+	 	if (!optionaldriver.isPresent()) {
+	 		throw new RuntimeException("Driver not found with email: " + email);
+	 	}
+
+	 	Driver driver = optionaldriver.get();
+	 	driver.setStripeAccountId(account.getId());
+	 	driverRepo.save(driver);
+
+	 	AccountLinkCreateParams linkParams = AccountLinkCreateParams.builder()
+	 			.setAccount(driver.getStripeAccountId())
+	 			.setRefreshUrl("http://localhost:3000/signup")      // TODO: Update this for production
+	 			.setReturnUrl("http://localhost:3000/home/userID")  // TODO: Update this for production
+	 			.setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
+	 			.build();
+
+	 	AccountLink accountLink = AccountLink.create(linkParams);
+	 	return accountLink.getUrl();
+	 }
+
+
+	 /**
+	  * Marks a ride as paid and notifies the driver via WebSocket.
+	  * Returns the updated ride if successful.
+	  */
 	 public Optional<Ride> updateRidePaymentAmount(String rideId) {
-		    try {
-		        Optional<Ride> rideOptional = rideRepo.findById(rideId);
+	 	try {
+	 		Optional<Ride> rideOptional = rideRepo.findById(rideId);
 
-		        if (rideOptional.isEmpty()) {
-		            System.out.println("Ride not found: " + rideId);
-		            return Optional.empty();
-		        }
+	 		if (rideOptional.isEmpty()) {
+	 			System.out.println("Ride not found: " + rideId);
+	 			return Optional.empty();
+	 		}
 
-		        Ride ride = rideOptional.get();
+	 		Ride ride = rideOptional.get();
 
-		        if (ride.isPaid()) {
-		            System.out.println("Ride is already marked as paid: " + rideId);
-		            return Optional.empty();
-		        }
+	 		if (ride.isPaid()) {
+	 			System.out.println("Ride is already marked as paid: " + rideId);
+	 			return Optional.empty();
+	 		}
 
-		        ride.setPaid(true);
-		        rideRepo.save(ride);
+	 		ride.setPaid(true);
+	 		rideRepo.save(ride);
 
-		        Optional<String> driverIdOptional = rideServ.getDriverIdByRideId(rideId);
-		        driverIdOptional.ifPresent(driverId -> {
-		            String driverDestination = "/topic/driver/" + driverId;
-		            Map<String, Object> notification = new HashMap<>();
-		            notification.put("title", "Ride Payment Received");
-		            notification.put("message", "A passenger has paid for the ride.");
-		            notification.put("rideId", ride.getId());
+	 		// Notify driver that the ride has been paid
+	 		Optional<String> driverIdOptional = rideServ.getDriverIdByRideId(rideId);
+	 		driverIdOptional.ifPresent(driverId -> {
+	 			String driverDestination = "/topic/driver/" + driverId;
 
-		            messagingTemplate.convertAndSend(driverDestination, notification);
-		            System.out.println("Sent WebSocket message to driver: " + driverId);
-		        });
+	 			Map<String, Object> notification = new HashMap<>();
+	 			notification.put("title", "Ride Payment Received");
+	 			notification.put("message", "A passenger has paid for the ride.");
+	 			notification.put("rideId", ride.getId());
 
-		        return Optional.of(ride);
-		    } catch (Exception e) {
-		        System.err.println("Error updating ride payment: " + e.getMessage());
-		        e.printStackTrace();
-		        return Optional.empty();
-		    }
-		}
-	 
-	 
+	 			messagingTemplate.convertAndSend(driverDestination, notification);
+	 			System.out.println("Sent WebSocket message to driver: " + driverId);
+	 		});
+
+	 		return Optional.of(ride);
+
+	 	} catch (Exception e) {
+	 		System.err.println("Error updating ride payment: " + e.getMessage());
+	 		e.printStackTrace();
+	 		return Optional.empty();
+	 	}
+	 }
+
+
+	 /**
+	  * Processes a Stripe refund for a paid ride using the stored PaymentIntent ID.
+	  * Updates local DB to reflect refunded status.
+	  */
 	 public Optional<Ride> refundRide(String rideId) {
-		    try {
-		        Optional<Ride> rideOptional = rideRepo.findById(rideId);
+	 	try {
+	 		Optional<Ride> rideOptional = rideRepo.findById(rideId);
 
-		        if (rideOptional.isEmpty()) {
-		            System.out.println("Ride not found: " + rideId);
-		            return Optional.empty();
-		        }
+	 		if (rideOptional.isEmpty()) {
+	 			System.out.println("Ride not found: " + rideId);
+	 			return Optional.empty();
+	 		}
 
-		        Ride ride = rideOptional.get();
+	 		Ride ride = rideOptional.get();
 
-		        if (!ride.isPaid()) {
-		            System.out.println("Ride is not paid: " + rideId);
-		            return Optional.empty();
-		        }
+	 		if (!ride.isPaid()) {
+	 			System.out.println("Ride is not paid: " + rideId);
+	 			return Optional.empty();
+	 		}
 
-		        String paymentIntentId = ride.getPaymentRequestRideId(); // Make sure you store this in your Ride model
+	 		String paymentIntentId = ride.getPaymentRequestRideId(); // Must be saved in your DB when creating intent
 
-		        if (paymentIntentId == null || paymentIntentId.isEmpty()) {
-		            System.out.println("PaymentIntent ID is missing for ride: " + rideId);
-		            return Optional.empty();
-		        }
+	 		if (paymentIntentId == null || paymentIntentId.isEmpty()) {
+	 			System.out.println("PaymentIntent ID is missing for ride: " + rideId);
+	 			return Optional.empty();
+	 		}
 
-		        // Step 1: Refund via Stripe
-		        RefundCreateParams params = RefundCreateParams.builder()
-		            .setPaymentIntent(paymentIntentId)
-		            .build();
+	 		// Issue refund through Stripe
+	 		RefundCreateParams params = RefundCreateParams.builder()
+	 				.setPaymentIntent(paymentIntentId)
+	 				.build();
 
-		        Refund refund = Refund.create(params);
-		        System.out.println("Refund issued: " + refund.getId());
+	 		Refund refund = Refund.create(params);
+	 		System.out.println("Refund issued: " + refund.getId());
 
-		        // Step 2: Update your app DB
-		        ride.setPaid(false);
-		        ride.setRefunded(true); // Optional: add this field if useful
-		        rideRepo.save(ride);
+	 		// Update ride record
+	 		ride.setPaid(false);
+	 		ride.setRefunded(true);  // Optional: useful for auditing or UI flags
+	 		rideRepo.save(ride);
 
-		        return Optional.of(ride);
+	 		return Optional.of(ride);
 
-		    } catch (StripeException e) {
-		        System.err.println("Stripe error during refund: " + e.getMessage());
-		        e.printStackTrace();
-		        return Optional.empty();
-		    } catch (Exception e) {
-		        System.err.println("Error processing refund: " + e.getMessage());
-		        e.printStackTrace();
-		        return Optional.empty();
-		    }
-		}
+	 	} catch (StripeException e) {
+	 		System.err.println("Stripe error during refund: " + e.getMessage());
+	 		e.printStackTrace();
+	 		return Optional.empty();
+
+	 	} catch (Exception e) {
+	 		System.err.println("Error processing refund: " + e.getMessage());
+	 		e.printStackTrace();
+	 		return Optional.empty();
+	 	}
+	 }
 	 
 	 
 }

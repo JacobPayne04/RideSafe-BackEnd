@@ -51,139 +51,185 @@ public class DriverController {
 		this.paymentServ = paymentServ;
 	}
 
+	// ========================= CREATE DRIVER =========================
+
+	/**
+	 * Creates a new driver in the system and returns the created driver object.
+	 */
 	@PostMapping("/new")
 	public ResponseEntity<Driver> createDriver(@RequestBody Driver driver, HttpSession session) {
-
 		Driver creatDriver = driverServ.creatDriver(driver);
-
 		return ResponseEntity.ok(creatDriver);
 	}
-	
-	//Start of implimenting new method 
+
+
+	// ========================= SUBMIT DRIVER APPLICATION =========================
+
+	/**
+	 * Accepts required information and document uploads to complete driver signup.
+	 */
 	@PostMapping("/Driver/complete/signup")
-	public ResponseEntity<?> SubmitDriverApplication( @RequestPart("info") DriverRequiredInformationDTO info,
+	public ResponseEntity<?> SubmitDriverApplication(
+			@RequestPart("info") DriverRequiredInformationDTO info,
 			@RequestPart("dlFile") MultipartFile dlFile,
-		    @RequestPart("studentIdFile") MultipartFile studentIdFile){
-		
-			try {
-				driverServ.processDriverRequiredInformationSignup(info, dlFile, studentIdFile);
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Driver application submitted successfully. " );
-			} catch (Exception e) {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("signup failed : " + e.getMessage());
-			}
+			@RequestPart("studentIdFile") MultipartFile studentIdFile) {
+
+		try {
+			driverServ.processDriverRequiredInformationSignup(info, dlFile, studentIdFile);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Driver application submitted successfully.");
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("signup failed : " + e.getMessage());
+		}
 	}
-	
-	
-	
 
-	// Current Driver in session route
 
-	// Getting One Driver
+	// ========================= GET DRIVER BY ID =========================
+
+	/**
+	 * Retrieves a driver by their unique ID.
+	 */
 	@GetMapping("/driver/{id}")
-	public ResponseEntity<?> getDriverById(@PathVariable("id") String id) { // Pass in the drivers Id to send to the
-																			// frontend
+	public ResponseEntity<?> getDriverById(@PathVariable("id") String id) {
+		Optional<Driver> driver = driverServ.getDriverById(id);
 
-		Optional<Driver> driver = driverServ.getDriverById(id); // fetching a driver by its id
-
-		if (driver.isEmpty()) { // if the driver does not exist, return "Driver not found."
+		if (driver.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Driver not found.");
 		}
 
-		return ResponseEntity.ok(driver.get()); // return the Driver
+		return ResponseEntity.ok(driver.get());
 	}
 
+
+	// ========================= DRIVER LOGIN =========================
+
+	/**
+	 * Logs in a driver using email and password.
+	 * Verifies credentials using BCrypt.
+	 */
 	@PostMapping("/login")
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginDriver loginDriver, HttpSession session) {
-		// Fetch the driver by email
 		Driver existingDriver = driverServ.getDriver(loginDriver.getEmail());
 
 		if (existingDriver == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Unknown email"));
 		}
 
-		// Check the password using BCrypt
 		if (!BCrypt.checkpw(loginDriver.getPassword(), existingDriver.getPassword())) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Incorrect password"));
 		}
 
-		// Login successful
 		return ResponseEntity.ok(Map.of("message", "Login successful", "id", existingDriver.getId()));
 	}
 
-	// ROUTES FOR DRIVER
-	// FUNCTIONALITY*******************************************************************************************
-		
-	//*************ended here*********4/24/25
+
+	// ========================= UPDATE DRIVER STATUS =========================
+
+	/**
+	 * Updates driver's availability (online/offline) and their coordinates.
+	 */
 	@PutMapping("/{id}/status")
-	public ResponseEntity<String> updateDriverStatus(@PathVariable("id") String id,
+	public ResponseEntity<String> updateDriverStatus(
+			@PathVariable("id") String id,
 			@RequestBody DriverStatusCoordinatesRequest request) {
+
 		driverServ.updateStatus(id, request.isOnline(), request.getLongitude(), request.getLatitude());
+
 		System.out.println("Driver cordinates" + request);
 		System.out.println("Received request: driver isOnline=" + request.isOnline() + ", lat=" + request.getLatitude());
 
 		return ResponseEntity.ok("Drive Status updated");
 	}
 
+
+	// ========================= GET ALL ONLINE DRIVERS =========================
+
+	/**
+	 * Returns a list of all drivers currently marked as online.
+	 */
 	@GetMapping("/online/drivers")
 	public ResponseEntity<List<Driver>> GetIsOnlineDrivers() {
-
 		List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
 		return ResponseEntity.ok(onlineDrivers);
-
 	}
-	
-	//NEW METHOD for nearby drivers
+
+
+	// ========================= GET NEARBY DRIVERS =========================
+
+	/**
+	 * Finds nearby drivers based on the passenger's coordinates.
+	 */
 	@PostMapping("/nearby/drivers")
-	public ResponseEntity<List<Driver>> getNearbyDrivers(@RequestBody PassengerStatusCoordiantesRequest passengerStatusCoordinatesRequest) {
-	    double latitude = passengerStatusCoordinatesRequest.getLatitude();
-	    double longitude = passengerStatusCoordinatesRequest.getLongitude();
+	public ResponseEntity<List<Driver>> getNearbyDrivers(
+			@RequestBody PassengerStatusCoordiantesRequest passengerStatusCoordinatesRequest) {
 
-	    List<Driver> nearbyDrivers = driverServ.findNearbyDrivers(latitude, longitude);
-	    return ResponseEntity.ok(nearbyDrivers);
+		double latitude = passengerStatusCoordinatesRequest.getLatitude();
+		double longitude = passengerStatusCoordinatesRequest.getLongitude();
+
+		List<Driver> nearbyDrivers = driverServ.findNearbyDrivers(latitude, longitude);
+		return ResponseEntity.ok(nearbyDrivers);
 	}
 
+
+	// ========================= EDIT DRIVER INFO =========================
+
+	/**
+	 * Updates driver profile info with new values.
+	 */
 	@PutMapping("/edit/driver/{id}")
 	public ResponseEntity<Driver> updateDriver(@PathVariable String id, @RequestBody Driver updatedDriver) {
 		Driver driver = driverServ.updateDriver(id, updatedDriver);
 		return ResponseEntity.ok(driver);
 	}
-	
-	//new method********
+
+
+	// ========================= STRIPE ONBOARDING =========================
+
+	/**
+	 * Starts the Stripe Express onboarding process for a driver using their email.
+	 */
 	@PostMapping("/Driver/stripe/signup")
 	public ResponseEntity<String> onboardDriver(@RequestParam String email) {
-	    try {
-	        System.out.println("🔁 Incoming request to onboard email: " + email);
+		try {
+			System.out.println("🔁 Incoming request to onboard email: " + email);
 
-	        String link = paymentServ.onboardDriver(email); // ⚠️ error likely happens here
+			String link = paymentServ.onboardDriver(email);
 
-	        System.out.println("✅ Generated Stripe onboarding link: " + link);
-	        return ResponseEntity.ok(link);
+			System.out.println("✅ Generated Stripe onboarding link: " + link);
+			return ResponseEntity.ok(link);
 
-	    } catch (Exception e) {
-	        System.out.println("❌ Stripe onboarding failed: " + e.getMessage());
-	        e.printStackTrace(); // 👈 shows the full error in your terminal
-	        return ResponseEntity.status(500).body("Error: " + e.getMessage());
-	    }
+		} catch (Exception e) {
+			System.out.println("❌ Stripe onboarding failed: " + e.getMessage());
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("Error: " + e.getMessage());
+		}
 	}
 
-	
-	
 
+	// ========================= GOOGLE SIGN-IN =========================
+
+	/**
+	 * Handles Google Sign-In for both drivers and passengers.
+	 * Determines if the user already exists or needs to register.
+	 */
 	@PostMapping("/signup/{role}/googleId")
-	public ResponseEntity<?> googleSignIn(@PathVariable String role, @RequestBody Map<String, String> requestBody,
+	public ResponseEntity<?> googleSignIn(
+			@PathVariable String role,
+			@RequestBody Map<String, String> requestBody,
 			HttpSession session) {
+
 		try {
 			String idToken = requestBody.get("googleId");
+
 			System.out.println("Received Google ID Token: " + idToken);
 			System.out.println("Received Role: " + role);
 
-			// Validate the Google ID token
 			if (idToken == null || idToken.isEmpty()) {
 				System.out.println("Error: Missing or invalid Google ID token");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing or invalid Google ID token");
 			}
 
-			// Verify the Google ID token
 			GoogleIdToken.Payload payload = GoogleAuthentication.verifyGoogleToken(idToken);
 			System.out.println("Google Token Verification Payload: " + payload);
 
@@ -192,13 +238,13 @@ public class DriverController {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google Token");
 			}
 
-			// Extract email and Google ID from the payload
 			String email = payload.getEmail();
 			String googleId = payload.getSubject();
+
 			System.out.println("Extracted Email: " + email);
 			System.out.println("Extracted Google ID: " + googleId);
 
-			// Check if the role is 'driver'
+			// ========== DRIVER LOGIC ==========
 			if ("driver".equals(role)) {
 				Optional<Driver> existingDriver = driverServ.getDriverByEmail(email);
 				System.out.println("Driver Lookup Result: " + existingDriver);
@@ -206,18 +252,22 @@ public class DriverController {
 				if (existingDriver.isPresent()) {
 					Driver driver = existingDriver.get();
 					session.setAttribute("driverId", driver.getId());
+
 					System.out.println("Driver Exists. ID: " + driver.getId());
 
-					return ResponseEntity.ok(Map.of("exists", true, "driverId", driver.getId(), "message",
-							"Driver found, proceed to home."));
+					return ResponseEntity.ok(Map.of(
+							"exists", true,
+							"driverId", driver.getId(),
+							"message", "Driver found, proceed to home."));
 				} else {
 					System.out.println("New Driver Detected. Redirecting to Registration.");
-
-					return ResponseEntity
-							.ok(Map.of("exists", false, "message", "New driver, please proceed to registration."));
+					return ResponseEntity.ok(Map.of(
+							"exists", false,
+							"message", "New driver, please proceed to registration."));
 				}
 			}
 
+			// ========== PASSENGER LOGIC ==========
 			if ("passenger".equals(role)) {
 				Optional<Passenger> existingPassenger = passengerServ.getPassengerByEmail(email);
 				System.out.println("Passenger Lookup Result: " + existingPassenger);
@@ -225,15 +275,18 @@ public class DriverController {
 				if (existingPassenger.isPresent()) {
 					Passenger passenger = existingPassenger.get();
 					session.setAttribute("passengerId", passenger.getId());
+
 					System.out.println("Passenger Exists. ID: " + passenger.getId());
 
-					return ResponseEntity.ok(Map.of("exists", true, "passengerId", passenger.getId(), "message",
-							"Passenger found, proceed to home."));
+					return ResponseEntity.ok(Map.of(
+							"exists", true,
+							"passengerId", passenger.getId(),
+							"message", "Passenger found, proceed to home."));
 				} else {
 					System.out.println("New Passenger Detected. Redirecting to Registration.");
-
-					return ResponseEntity
-							.ok(Map.of("exists", false, "message", "New Passenger, please proceed to registration."));
+					return ResponseEntity.ok(Map.of(
+							"exists", false,
+							"message", "New Passenger, please proceed to registration."));
 				}
 			}
 
@@ -242,16 +295,16 @@ public class DriverController {
 
 		} catch (IOException e) {
 			System.out.println("Google Authentication Failed: " + e.getMessage());
-			e.printStackTrace(); // Log full error details
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 					.body("Google authentication failed: " + e.getMessage());
+
 		} catch (Exception e) {
 			System.out.println("Unexpected Error: " + e.getMessage());
-			e.printStackTrace(); // Log full error details
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("Google Sign-In Failed: " + e.getMessage());
 		}
 	}
-	
 
 }

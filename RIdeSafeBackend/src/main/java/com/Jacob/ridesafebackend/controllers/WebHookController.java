@@ -31,114 +31,84 @@ public class WebHookController {
 	    private String endpointSecret;
 
 	
+	    /**
+	     * Handles incoming Stripe web hook events.
+	     * Validates the signature and processes payment-related events like success and failure.
+	     */
 	    @PostMapping("/stripe/paymentStatus")
-	    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload,
-	                                                      @RequestHeader("Stripe-Signature") String sigHeader) {
-	    	  System.out.println("🚨 Stripe Webhook Secret at runtime: " + endpointSecret);
-	        System.out.println("🔔 Webhook endpoint was hit");
-	        System.out.println("Received Stripe-Signature: " + sigHeader);
+	    public ResponseEntity<String> handleStripeWebhook(
+	    		@RequestBody String payload,
+	    		@RequestHeader("Stripe-Signature") String sigHeader) {
 
-	        Event event;
+	    	System.out.println("🚨 Stripe Webhook Secret at runtime: " + endpointSecret);
+	    	System.out.println("🔔 Webhook endpoint was hit");
+	    	System.out.println("Received Stripe-Signature: " + sigHeader);
 
-	        try {
-	            System.out.println("🔐 Validating signature using secret: " + endpointSecret);
-	            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
-	            System.out.println("✅ Webhook signature verified. Event type: " + event.getType());
-	        } catch (SignatureVerificationException e) {
-	            System.out.println("❌ Invalid signature: " + e.getMessage());
-	            return ResponseEntity.badRequest().body("Invalid signature");
-	        }
+	    	Event event;
 
-	        switch (event.getType()) {
-	            case "payment_intent.succeeded":
-	                System.out.println("💳 Handling payment success");
+	    	try {
+	    		// Validate Stripe signature using the endpoint secret
+	    		System.out.println("🔐 Validating signature using secret: " + endpointSecret);
+	    		event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+	    		System.out.println("✅ Webhook signature verified. Event type: " + event.getType());
 
-	                PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
-	                        .getObject()
-	                        .orElse(null);
+	    	} catch (SignatureVerificationException e) {
+	    		System.out.println("❌ Invalid signature: " + e.getMessage());
+	    		return ResponseEntity.badRequest().body("Invalid signature");
+	    	}
 
-	                if (paymentIntent != null) {
-	                    String paymentIntentId = paymentIntent.getId();
-	                    System.out.println("📦 PaymentIntent ID: " + paymentIntentId);
-	                    //#TODO make it where we are getting driverid in the meta data. -> then 
-	                    // String DriverId = paymentIntent.getMetadata().get("DriverID");
-	                    
-	                    String rideId = paymentIntent.getMetadata().get("rideId");
-	                    System.out.println("🛻 rideId from metadata: " + rideId);
+	    	// Handle the specific type of Stripe event
+	    	switch (event.getType()) {
 
-	                    if (rideId != null) {
-	                        paymentService.updateRidePaymentAmount(rideId)
-	                                .ifPresentOrElse(
-	                                        ride -> System.out.println("✅ Ride " + ride.getId() + " marked as PAID."),
-	                                        () -> System.out.println("⚠️ No unpaid ride found for rideId: " + rideId)
-	                                );
-	                    } else {
-	                        System.out.println("❗ rideId not found in metadata");
-	                    }
-	                } else {
-	                    System.out.println("⚠️ PaymentIntent object was null");
-	                }
-	                break;
+	    		case "payment_intent.succeeded":
+	    			System.out.println("💳 Handling payment success");
 
-	            case "payment_intent.payment_failed":
-	                System.out.println("❌ Handling failed payment");
-	                PaymentIntent failedIntent = (PaymentIntent) event.getDataObjectDeserializer()
-	                        .getObject()
-	                        .orElse(null);
-	                if (failedIntent != null) {
-	                    System.out.println("❌ Payment failed for: " + failedIntent.getId());
-	                }
-	                break;
+	    			// Deserialize payment intent object
+	    			PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
+	    					.getObject()
+	    					.orElse(null);
 
-	            default:
-	                System.out.println("🤷 Unhandled event type: " + event.getType());
-	        }
+	    			if (paymentIntent != null) {
+	    				String paymentIntentId = paymentIntent.getId();
+	    				System.out.println("📦 PaymentIntent ID: " + paymentIntentId);
 
-	        return ResponseEntity.ok("Webhook processed");
+	    				// #TODO: In the future, fetch driverId from metadata if needed
+	    				String rideId = paymentIntent.getMetadata().get("rideId");
+	    				System.out.println("🛻 rideId from metadata: " + rideId);
+
+	    				if (rideId != null) {
+	    					paymentService.updateRidePaymentAmount(rideId)
+	    							.ifPresentOrElse(
+	    									ride -> System.out.println("✅ Ride " + ride.getId() + " marked as PAID."),
+	    									() -> System.out.println("⚠️ No unpaid ride found for rideId: " + rideId)
+	    							);
+	    				} else {
+	    					System.out.println("❗ rideId not found in metadata");
+	    				}
+
+	    			} else {
+	    				System.out.println("⚠️ PaymentIntent object was null");
+	    			}
+	    			break;
+
+	    		case "payment_intent.payment_failed":
+	    			System.out.println("❌ Handling failed payment");
+
+	    			PaymentIntent failedIntent = (PaymentIntent) event.getDataObjectDeserializer()
+	    					.getObject()
+	    					.orElse(null);
+
+	    			if (failedIntent != null) {
+	    				System.out.println("❌ Payment failed for: " + failedIntent.getId());
+	    			}
+	    			break;
+
+	    		default:
+	    			System.out.println("🤷 Unhandled event type: " + event.getType());
+	    	}
+
+	    	return ResponseEntity.ok("Webhook processed");
 	    }
-
-	//#TODO fix this webhook controller to trigger the other requirements such as updating database and triggering webhook
-//	 @PostMapping("/stripe/paymentStatus")
-//	    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload,
-//	                                                      @RequestHeader("Stripe-Signature") String sigHeader) {
-//	        Event event;
-//
-//	        try {
-//	            // Validate signature and construct the event
-//	            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
-//	        } catch (SignatureVerificationException e) {
-//	            // Invalid signature
-//	            return ResponseEntity.badRequest().body("Invalid signature");
-//	        }
-//
-//	        // Handle the event type
-//	        switch (event.getType()) {
-//	            case "payment_intent.succeeded":
-//	                PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
-//	                //TODO insert ride repo update to paid ride.
-//	                if (paymentIntent != null) {
-//	                    String paymentIntentId = paymentIntent.getId();
-//	                    System.out.println("Payment succeeded for: " + paymentIntentId);
-//
-//	                    // TODO: Update your database (mark payment as complete, trigger ride, etc.)
-//	                }
-//	                break;
-//
-//	            case "payment_intent.payment_failed":
-//	                PaymentIntent failedIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
-//	                if (failedIntent != null) {
-//	                    String failedIntentId = failedIntent.getId();
-//	                    System.out.println("Payment failed for: " + failedIntentId);
-//
-//	                    // TODO: Handle the failure (send notification, update status)
-//	                }
-//	                break;
-//
-//	            default:
-//	                System.out.println("Unhandled event type: " + event.getType());
-//	        }
-//
-//	        return ResponseEntity.ok("");
-//	    }  
+	
 
 }

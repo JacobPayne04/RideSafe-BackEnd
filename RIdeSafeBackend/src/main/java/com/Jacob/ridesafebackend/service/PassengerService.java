@@ -20,58 +20,88 @@ public class PassengerService {
 			this.passengerRepo = passengerRepo;
 		}
 		
+		/**
+		 * Creates a new passenger with a hashed password.
+		 */
 		public Passenger createPassenger(Passenger passenger) {
 			String hashed = BCrypt.hashpw(passenger.getPassword(), BCrypt.gensalt());
 			passenger.setPassword(hashed);
 			return passengerRepo.save(passenger);
 		}
-		
-		public List<Passenger> getAllPassengers(){
+
+
+		/**
+		 * Returns all passengers in the system.
+		 */
+		public List<Passenger> getAllPassengers() {
 			return passengerRepo.findAll();
 		}
-		//added get driver by id route
-		public Optional<Passenger> getPassengerById(String id){
+
+
+		/**
+		 * Finds a passenger by ID.
+		 */
+		public Optional<Passenger> getPassengerById(String id) {
 			return passengerRepo.findById(id);
 		}
-		
-		// Retrieve a passenger by email ??******************************* THIS IS NEW
+
+
+		/**
+		 * Retrieves a passenger by email. Logs a warning if multiple are found.
+		 */
 		public Optional<Passenger> getPassengerByEmail(String email) {
-		    // Use a repository method that returns a List of drivers with the given email
-		    List<Passenger> passengers = passengerRepo.findAllByEmail(email);
-		    if (passengers.isEmpty()) {
-		        return Optional.empty();
-		    } else if (passengers.size() > 1) {
-		        System.out.println("Warning: Multiple drivers found with the same email: " + email);
-		    }
-		    return Optional.of(passengers.get(0));
+			List<Passenger> passengers = passengerRepo.findAllByEmail(email);
+
+			if (passengers.isEmpty()) {
+				return Optional.empty();
+			} else if (passengers.size() > 1) {
+				System.out.println("Warning: Multiple passengers found with the same email: " + email);
+			}
+
+			return Optional.of(passengers.get(0));
 		}
 
-		// ✅ Used for regular (throws an error if not found)
+
+		/**
+		 * Retrieves a passenger by email. Throws an error if not found.
+		 * Used for login and authenticated requests.
+		 */
 		public Passenger getPassenger(String email) {
-		    List<Passenger> passengers = passengerRepo.findAllByEmail(email);
-		    if (passengers.isEmpty()) {
-		        throw new RuntimeException("Passenger not found with email: " + email);
-		    }
-		    return passengers.get(0);  // Returns the first driver found
+			List<Passenger> passengers = passengerRepo.findAllByEmail(email);
+
+			if (passengers.isEmpty()) {
+				throw new RuntimeException("Passenger not found with email: " + email);
+			}
+
+			return passengers.get(0);
 		}
 
-	    // Authenticate a driver by verifying their password
-	    public boolean authenticatePassenger(String rawPassword, String hashedPassword) {
-	        return BCrypt.checkpw(rawPassword, hashedPassword);
-	    }
-		
-	    public Optional<Passenger> findPassengerByEmailOrGoogleId(String googleId){
-	    	return passengerRepo.findPassengerByGoogleId(googleId);
-	    }
 
-		
-	    
-	    //new method to get passenger coordinates
+		/**
+		 * Verifies if the input password matches the hashed password.
+		 */
+		public boolean authenticatePassenger(String rawPassword, String hashedPassword) {
+			return BCrypt.checkpw(rawPassword, hashedPassword);
+		}
+
+
+		/**
+		 * Finds a passenger using either their email or Google ID.
+		 */
+		public Optional<Passenger> findPassengerByEmailOrGoogleId(String googleId) {
+			return passengerRepo.findPassengerByGoogleId(googleId);
+		}
+
+
+		/**
+		 * Updates the passenger's location using coordinates (used for mapping or proximity).
+		 */
 		public void updatePasengerStatus(String id, Double longitude, Double latitude) {
-			Passenger passenger = passengerRepo.findById(id).orElseThrow(()-> new RuntimeException("Passneger not found"));
-			
-			if(longitude != null & latitude != null) {
-				passenger.setLocation(new GeoJsonPoint(longitude, latitude));  
+			Passenger passenger = passengerRepo.findById(id)
+					.orElseThrow(() -> new RuntimeException("Passneger not found"));
+
+			if (longitude != null & latitude != null) {
+				passenger.setLocation(new GeoJsonPoint(longitude, latitude));
 				passengerRepo.save(passenger);
 			}
 		}
