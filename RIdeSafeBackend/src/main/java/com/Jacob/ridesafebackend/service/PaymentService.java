@@ -81,7 +81,7 @@ public class PaymentService {
 	  * Starts Stripe Express on boarding for a driver using their email.
 	  * Saves the Stripe Account ID to the driver and returns the on boarding URL.
 	  */
-	 public String onboardDriver(String email) throws Exception {
+	 public String onboardDriver(String email, String driverId) throws Exception {
 	 	AccountCreateParams accountParams = AccountCreateParams.builder()
 	 			.setType(AccountCreateParams.Type.EXPRESS)
 	 			.setEmail(email)
@@ -90,10 +90,10 @@ public class PaymentService {
 
 	 	Account account = Account.create(accountParams);
 
-	 	Optional<Driver> optionaldriver = driverRepo.findDriverByEmail(email);
+	 	Optional<Driver> optionaldriver = driverRepo.findById(driverId);
 
 	 	if (!optionaldriver.isPresent()) {
-	 		throw new RuntimeException("Driver not found with email: " + email);
+	 		throw new RuntimeException("Driver not found with driver Id: " + driverId);
 	 	}
 
 	 	Driver driver = optionaldriver.get();
@@ -101,9 +101,9 @@ public class PaymentService {
 	 	driverRepo.save(driver);
 
 	 	AccountLinkCreateParams linkParams = AccountLinkCreateParams.builder()
-	 			.setAccount(driver.getStripeAccountId())
-	 			.setRefreshUrl("http://localhost:3000/signup")      // TODO: Update this for production
-	 			.setReturnUrl("http://localhost:3000/home/userID")  // TODO: Update this for production
+	 			.setAccount(driver.getId())
+	 			.setRefreshUrl("http://localhost:3000/driver/" + driverId + "/verification/account/setup")      // TODO: Update this for production
+	 			.setReturnUrl("http://localhost:3000/driver/" + driverId + "/verification/account/setup?stripe=success")  // TODO: Update this for production
 	 			.setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
 	 			.build();
 
