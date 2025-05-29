@@ -190,11 +190,11 @@ public class DriverController {
 	 * Starts the Stripe Express onboarding process for a driver using their email.
 	 */
 	@PostMapping("/Driver/stripe/signup")
-	public ResponseEntity<String> onboardDriver(@RequestParam String email) {
+	public ResponseEntity<String> onboardDriver(@RequestParam String email, @RequestParam String driverId) {
 		try {
-			System.out.println("🔁 Incoming request to onboard email: " + email);
+			System.out.println("🔁 Incoming request to onboard email: " + email + " Driver Id: " + driverId);
 
-			String link = paymentServ.onboardDriver(email);
+			String link = paymentServ.onboardDriver(email, driverId);
 
 			System.out.println("✅ Generated Stripe onboarding link: " + link);
 			return ResponseEntity.ok(link);
