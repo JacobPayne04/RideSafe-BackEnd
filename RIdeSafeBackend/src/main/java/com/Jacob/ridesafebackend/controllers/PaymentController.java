@@ -27,54 +27,70 @@ public class PaymentController {
     @Autowired
     private RideRepository rideRepo;  // Inject RideRepository
 
+    /**
+     * Creates a Stripe PaymentIntent for a given ride.
+     * Requires a valid rideId in the request body.
+     */
     @PostMapping("/create-Payment-Intent")
     public ResponseEntity<?> createPaymentIntent(@RequestBody Map<String, String> request) {
-        try {
-            String rideId = request.get("rideId");
+    	try {
+    		String rideId = request.get("rideId");
 
-            // Ensure rideId is provided
-            if (rideId == null || rideId.isBlank()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Ride ID is required"));
-            }
+    		// Validate request
+    		if (rideId == null || rideId.isBlank()) {
+    			return ResponseEntity.badRequest().body(Map.of("error", "Ride ID is required"));
+    		}
 
-            Optional<Ride> optionalRide = rideRepo.findById(rideId);
-            
-            if (optionalRide.isEmpty()) {
-                return ResponseEntity.status(404).body(Map.of("error", "Ride not found"));
-            }
+    		Optional<Ride> optionalRide = rideRepo.findById(rideId);
 
-            Ride ride = optionalRide.get();
-            Map<String, String> clientSecretResponse = paymentServ.createPaymentIntent(ride);
+    		if (optionalRide.isEmpty()) {
+    			return ResponseEntity.status(404).body(Map.of("error", "Ride not found"));
+    		}
 
-            return ResponseEntity.ok(clientSecretResponse);
-        } catch (StripeException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", "Payment Intent Creation Failed"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", "An unexpected error occurred"));
-        }
+    		Ride ride = optionalRide.get();
+
+    		// Delegate to payment service to create PaymentIntent
+    		Map<String, String> clientSecretResponse = paymentServ.createPaymentIntent(ride);
+
+    		return ResponseEntity.ok(clientSecretResponse);
+
+    	} catch (StripeException e) {
+    		e.printStackTrace();
+    		return ResponseEntity.status(500).body(Map.of("error", "Payment Intent Creation Failed"));
+
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return ResponseEntity.status(500).body(Map.of("error", "An unexpected error occurred"));
+    	}
     }
 
-    
+
+    /**
+     * Refunds a payment using its PaymentIntent ID.
+     * Requires "paymentIntentId" in the request body.
+     */
     @PostMapping("/refund")
     public ResponseEntity<?> refundPayment(@RequestBody Map<String, String> request) {
-        String paymentIntentId = request.get("paymentIntentId");
+    	String paymentIntentId = request.get("paymentIntentId");
 
-        try {
-            // Create refund
-            RefundCreateParams params = RefundCreateParams.builder()
-                .setPaymentIntent(paymentIntentId)
-                .build();
+    	try {
+    		// Create refund request
+    		RefundCreateParams params = RefundCreateParams.builder()
+    				.setPaymentIntent(paymentIntentId)
+    				.build();
 
-            Refund refund = Refund.create(params);
+    		Refund refund = Refund.create(params);
 
-            return ResponseEntity.ok(Map.of("message", "Refund successful", "refundId", refund.getId()));
-        } catch (StripeException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Refund failed: " + e.getMessage()));
-        }
+    		return ResponseEntity.ok(Map.of(
+    				"message", "Refund successful",
+    				"refundId", refund.getId()
+    		));
+
+    	} catch (StripeException e) {
+    		e.printStackTrace();
+    		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    				.body(Map.of("error", "Refund failed: " + e.getMessage()));
+    	}
     }
 
 }

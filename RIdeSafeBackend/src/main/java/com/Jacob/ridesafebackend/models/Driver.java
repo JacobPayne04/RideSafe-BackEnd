@@ -18,9 +18,11 @@ public class Driver {
 	@Id
 	private String id;
 	
+	private String stripeAccountId;
+	
 	private boolean isOnline;
 	private boolean acceptedTerms;
-	private boolean isAllowedToDriver = true;
+	private boolean isAllowedToDrive = false;
 	
 	private int DriverRate;
 	
@@ -65,6 +67,14 @@ public class Driver {
 	
 	
 	
+	public String getStripeAccountId() {
+		return stripeAccountId;
+	}
+
+	public void setStripeAccountId(String stripeAccountId) {
+		this.stripeAccountId = stripeAccountId;
+	}
+
 	public String geteSign() {
 		return eSign;
 	}
@@ -82,11 +92,11 @@ public class Driver {
 	}
 
 	public boolean isAllowedToDriver() {
-		return isAllowedToDriver;
+		return isAllowedToDrive;
 	}
 
 	public void setAllowedToDriver(boolean isAllowedToDriver) {
-		this.isAllowedToDriver = isAllowedToDriver;
+		this.isAllowedToDrive = isAllowedToDriver;
 	}
 
 	public String getDlFileUrl() {

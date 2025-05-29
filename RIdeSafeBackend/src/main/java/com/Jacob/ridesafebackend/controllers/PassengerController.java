@@ -40,67 +40,84 @@ public class PassengerController {
 		this.GoogleAuth = GoogleAuth;
 	}
 
+	// ========================= CREATE PASSENGER =========================
+
+	/**
+	 * Creates a new passenger account and returns the saved object.
+	 */
 	@PostMapping("/new/passenger")
 	public ResponseEntity<Passenger> createPassenger(@RequestBody Passenger passenger, HttpSession session) {
-
 		Passenger createPassenger = passengerServ.createPassenger(passenger);
-
 		return ResponseEntity.ok(createPassenger);
 	}
 
-	// Current Driver in session route
+
+	// ========================= GET ALL PASSENGERS =========================
+
+	/**
+	 * Retrieves a list of all registered passengers.
+	 */
 	@GetMapping("/passenger")
 	public ResponseEntity<List<Passenger>> getAllPassenges() {
 		List<Passenger> passenger = passengerServ.getAllPassengers();
 		return ResponseEntity.ok(passenger);
 	}
 
-	// Getting One Driver
+
+	// ========================= GET PASSENGER BY ID =========================
+
+	/**
+	 * Retrieves a single passenger by their ID.
+	 */
 	@GetMapping("/passenger/{id}")
-	public ResponseEntity<?> getPassengerById(@PathVariable("id") String id) { // Pass in the drivers Id to send to the
-																				// frontend
+	public ResponseEntity<?> getPassengerById(@PathVariable("id") String id) {
+		Optional<Passenger> passenger = passengerServ.getPassengerById(id);
 
-		Optional<Passenger> passenger = passengerServ.getPassengerById(id); // fetching a driver by its id
-
-		if (passenger.isEmpty()) { // if the driver does not exist, return "Driver not found."
+		if (passenger.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Passenger not found.");
 		}
 
-		return ResponseEntity.ok(passenger.get()); // return the Driver
+		return ResponseEntity.ok(passenger.get());
 	}
 
+
+	// ========================= PASSENGER LOGIN =========================
+
+	/**
+	 * Logs in a passenger using email and password.
+	 */
 	@PostMapping("/login/passenger")
-	    public ResponseEntity<Map<String, String>> login(@RequestBody LoginPassenger loginPassenger,HttpSession session) {
-	        // Fetch the driver by email
-		   Passenger existingPassenger = passengerServ.getPassenger(loginPassenger.getEmail());
-	        
-	        if (existingPassenger == null) {
-	            return ResponseEntity
-	                    .status(HttpStatus.BAD_REQUEST)
-	                    .body(Map.of("message", "Unknown email"));
-	        }
+	public ResponseEntity<Map<String, String>> login(@RequestBody LoginPassenger loginPassenger, HttpSession session) {
+		// Fetch passenger by email
+		Passenger existingPassenger = passengerServ.getPassenger(loginPassenger.getEmail());
 
-	        // Check the password using BCrypt
-	        if (!BCrypt.checkpw(loginPassenger.getPassword(), existingPassenger.getPassword())) {
-	            return ResponseEntity
-	                    .status(HttpStatus.BAD_REQUEST)
-	                    .body(Map.of("message", "Incorrect password"));
-	        }
-	   
-	        // Login successful
-	        return ResponseEntity.ok(Map.of("message", "Login successful","id",existingPassenger.getId()));
-	      
-	    }
+		if (existingPassenger == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Unknown email"));
+		}
+
+		// Validate password with BCrypt
+		if (!BCrypt.checkpw(loginPassenger.getPassword(), existingPassenger.getPassword())) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Incorrect password"));
+		}
+
+		// Login successful
+		return ResponseEntity.ok(Map.of("message", "Login successful", "id", existingPassenger.getId()));
+	}
 
 
-		//passenger coordiantes request
+	// ========================= UPDATE PASSENGER COORDINATES =========================
+
+	/**
+	 * Updates a passenger's current coordinates (e.g. for nearby driver lookups).
+	 */
 	@PutMapping("/{id}/status/passenger")
 	public ResponseEntity<String> updatePassengerStatus(@PathVariable("id") String id, @RequestBody PassengerStatusCoordiantesRequest request) {
-		passengerServ.updatePasengerStatus(id,request.getLongitude(),request.getLatitude());
+		passengerServ.updatePasengerStatus(id, request.getLongitude(), request.getLatitude());
+
 		System.out.println("Passenger Coordinates" + request);
+
 		return ResponseEntity.ok("Passenger Status updated");
 	}
-	
 	
 	// WORKING FOR MEG REPO
 }
