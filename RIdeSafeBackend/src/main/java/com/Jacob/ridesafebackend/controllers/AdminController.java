@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.models.Driver;
+import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.service.AdminService;
 
 @RestController
@@ -17,12 +18,13 @@ public class AdminController {
 	
 	private final AdminService adminServ;
 	
+	
 	  @Autowired
 	  public AdminController(AdminService adminServ) {
 	        this.adminServ = adminServ;
 	    }
 
-	  		// ✅ Get all drivers who are not allowed to drive
+	  		//  Get all drivers who are not allowed to drive
 	  		@GetMapping("/drivers/unapproved")
 	  		public ResponseEntity<List<Driver>> getUapprovedDrivers(){
 	  			
@@ -33,10 +35,25 @@ public class AdminController {
 	  		
 	  		
 	  		
-	  		 // ✅ Approve a driver by ID
+	  		 //  Approve a driver by ID
 	  		@PutMapping("/approve/driver/{id}")
 	  		public ResponseEntity<String> approveDriver(@PathVariable String id){
 	  			String message = adminServ.approveDriver(id);
 	  			return ResponseEntity.ok(message);
 	  		}
+	  		
+	  		
+	  		@GetMapping("/admin/drivers/all")
+	  		public ResponseEntity<List<Driver>> adminGetAllDrivers() {
+	  			List<Driver> driver = adminServ.getAllDrivers();
+				return ResponseEntity.ok(driver);
+	  		}
+	  		
+	  		@GetMapping("/admin/passengers/all")
+	  		public ResponseEntity<List<Passenger>> adminGetAllPassengers(){
+	  			List<Passenger> passenger = adminServ.getAllPassengers();
+	  			return ResponseEntity.ok(passenger);
+	  		}
+	  		
+	  		
 }
