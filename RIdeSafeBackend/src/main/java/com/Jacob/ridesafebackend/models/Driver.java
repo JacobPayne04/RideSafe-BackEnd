@@ -37,9 +37,9 @@ public class Driver {
 	private String eSign;
 	private String licensePlate;
 	
-	private double averageRating;
-	private int totalRatings;
-	private int ratingSum;
+    private int totalRatings;
+    private int ratingSum;
+    private double averageRating;
 	
 	
 	
@@ -73,12 +73,16 @@ public class Driver {
 		return stripeAccountId;
 	}
 
-	public double getAverageRating() {
-		return averageRating;
+	public void setStripeAccountId(String stripeAccountId) {
+		this.stripeAccountId = stripeAccountId;
 	}
 
-	public void setAverageRating(double averageRating) {
-		this.averageRating = averageRating;
+	public boolean isAllowedToDrive() {
+		return isAllowedToDrive;
+	}
+
+	public void setAllowedToDrive(boolean isAllowedToDrive) {
+		this.isAllowedToDrive = isAllowedToDrive;
 	}
 
 	public int getTotalRatings() {
@@ -97,8 +101,12 @@ public class Driver {
 		this.ratingSum = ratingSum;
 	}
 
-	public void setStripeAccountId(String stripeAccountId) {
-		this.stripeAccountId = stripeAccountId;
+	public double getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(double averageRating) {
+		this.averageRating = averageRating;
 	}
 
 	public String geteSign() {
