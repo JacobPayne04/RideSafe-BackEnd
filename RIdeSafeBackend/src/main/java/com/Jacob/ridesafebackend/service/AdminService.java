@@ -7,17 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.models.Driver;
+import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.repositorys.DriverRepository;
+import com.Jacob.ridesafebackend.repositorys.PassengerRepository;
 
 @Service
 public class AdminService {
 
 	
 	private final DriverRepository driverRepo;
+	private final PassengerRepository passengerRepo;
 	
 	@Autowired
-	public AdminService(DriverRepository driverRepo) {
+	public AdminService(DriverRepository driverRepo ,PassengerRepository passengerRepo) {
 	this.driverRepo = driverRepo;	
+	this.passengerRepo = passengerRepo;
 	}
 	
 	
@@ -27,6 +31,10 @@ public class AdminService {
 	public List<Driver> getUapprovedDrivers(){
 		return  driverRepo.findByIsAllowedToDriveFalse();
 	}
+	
+	/**
+	 * Approves drivers
+	 */
 	
 	public String approveDriver(String id) {
 		Optional<Driver>  optionalDriver = driverRepo.findById(id);
@@ -41,7 +49,22 @@ public class AdminService {
 		return "driver approved successfully: ";
 	}
 	
+	/**
+	 * Retrieves all driver info
+	 */
+	public List<Driver> getAllDrivers(){
+		return driverRepo.findAll();
+	}
 	
 	
+	
+	
+	/**
+	 * Retrieve all passenger info
+	 */
+	
+	public List<Passenger> getAllPassengers(){
+		return passengerRepo.findAll();
+	}
 	
 }
