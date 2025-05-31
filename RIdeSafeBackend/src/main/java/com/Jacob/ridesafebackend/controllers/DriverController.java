@@ -23,12 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.Jacob.ridesafebackend.dto.DriverRequiredInformationDTO;
 import com.Jacob.ridesafebackend.dto.DriverStatusCoordinatesRequest;
 import com.Jacob.ridesafebackend.dto.PassengerStatusCoordiantesRequest;
-import com.Jacob.ridesafebackend.dto.ReviewRequest;
 import com.Jacob.ridesafebackend.models.Driver;
-import com.Jacob.ridesafebackend.models.DriverReview;
+import com.Jacob.ridesafebackend.models.DriverRating;
 import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.models.Passenger;
-import com.Jacob.ridesafebackend.service.DriverReviewService;
+import com.Jacob.ridesafebackend.repositorys.DriverRatingRepository;
 import com.Jacob.ridesafebackend.service.DriverService;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import com.Jacob.ridesafebackend.service.PassengerService;
@@ -46,14 +45,14 @@ public class DriverController {
 	private final GoogleAuthentication GoogleAuth;
 	private final PassengerService passengerServ;
 	private final PaymentService paymentServ;
-	private final DriverReviewService reviewService;
+	private final DriverRatingRepository driverRatingRepo;
 
-	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ,PaymentService paymentServ, DriverReviewService reviewService) {
+	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ,PaymentService paymentServ, DriverRatingRepository driverRatingRepo) {
 		this.driverServ = driverServ;
 		this.GoogleAuth = GoogleAuth;
 		this.passengerServ = passengerServ;
 		this.paymentServ = paymentServ;
-		this.reviewService = reviewService;
+		this.driverRatingRepo = driverRatingRepo;
 	}
 
 	// ========================= CREATE DRIVER =========================
@@ -112,16 +111,43 @@ public class DriverController {
 	 * Reviews for the Driver
 	 */
 	@PutMapping("/send/Review")
-    public ResponseEntity<String> addReview(@RequestBody ReviewRequest reviewRequest) {
-        if (reviewRequest.getStars() < 1 || reviewRequest.getStars() > 5) {
-            return ResponseEntity.badRequest().body("Stars must be between 1 and 5");
-        }
+	public ResponseEntity<?> rateDriver(@RequestBody Map<String, String> payload) {
+	    String driverId = payload.get("driverId");
+	    String passengerId = payload.get("passengerId");
+	    int stars = Integer.parseInt(payload.get("stars"));
 
-        DriverReview review = new DriverReview(reviewRequest.getDriverId(), reviewRequest.getStars());
-        reviewService.saveReview(review);
+	    Optional<DriverRating> existingRating = driverRatingRepo.findByPassengerIdAndDriverId(passengerId, driverId);
+	    if (existingRating.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body("You already rated this driver.");
+	    }
 
-        return ResponseEntity.ok("Review saved successfully");
-    }
+	    Optional<Driver> optionalDriver = driverServ.getDriverById(driverId);
+	    if (!optionalDriver.isPresent()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Driver not found.");
+	    }
+
+	    Driver driver = optionalDriver.get();
+
+	    // Save the new rating
+	    DriverRating rating = new DriverRating();
+	    rating.setPassengerId(passengerId);
+	    rating.setDriverId(driverId);
+	    rating.setStars(stars);
+	    driverRatingRepo.save(rating);
+
+	    // Update the driver's rating stats
+	    int newRatingSum = driver.getRatingSum() + stars;
+	    int newTotal = driver.getTotalRatings() + 1;
+	    double newAverage = (double) newRatingSum / newTotal;
+
+	    driver.setRatingSum(newRatingSum);
+	    driver.setTotalRatings(newTotal);
+	    driver.setAverageRating(newAverage);
+
+	    driverServ.save(driver);
+
+	    return ResponseEntity.ok("Rating submitted successfully.");
+	}
 
 
 	// ========================= DRIVER LOGIN =========================
