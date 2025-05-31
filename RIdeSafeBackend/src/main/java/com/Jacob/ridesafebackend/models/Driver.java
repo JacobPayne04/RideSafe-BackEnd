@@ -18,6 +18,8 @@ public class Driver {
 	@Id
 	private String id;
 	
+	private String googleId;
+	
 	private String stripeAccountId;
 	
 	private boolean isOnline;
@@ -33,6 +35,11 @@ public class Driver {
 	private String dlFileUrl;
 	private String studentIdFileUrl;
 	private String eSign;
+	private String licensePlate;
+	
+	private double averageRating;
+	private int totalRatings;
+	private int ratingSum;
 	
 	
 	
@@ -61,14 +68,33 @@ public class Driver {
 	@NotEmpty(message = "License plate is required!")
 	@Size(min = 5,max = 9,message = "License plate must be between 3 and 9 characters" )
 	
-	private String licensePlate;
-	
-	private String googleId; 
-	
-	
 	
 	public String getStripeAccountId() {
 		return stripeAccountId;
+	}
+
+	public double getAverageRating() {
+		return averageRating;
+	}
+
+	public void setAverageRating(double averageRating) {
+		this.averageRating = averageRating;
+	}
+
+	public int getTotalRatings() {
+		return totalRatings;
+	}
+
+	public void setTotalRatings(int totalRatings) {
+		this.totalRatings = totalRatings;
+	}
+
+	public int getRatingSum() {
+		return ratingSum;
+	}
+
+	public void setRatingSum(int ratingSum) {
+		this.ratingSum = ratingSum;
 	}
 
 	public void setStripeAccountId(String stripeAccountId) {

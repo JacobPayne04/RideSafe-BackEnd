@@ -28,6 +28,10 @@ public class AdminService {
 		return  driverRepo.findByIsAllowedToDriveFalse();
 	}
 	
+	/**
+	 * Approves drivers
+	 */
+	
 	public String approveDriver(String id) {
 		Optional<Driver>  optionalDriver = driverRepo.findById(id);
 		if(!optionalDriver.isPresent()) {
@@ -41,7 +45,17 @@ public class AdminService {
 		return "driver approved successfully: ";
 	}
 	
+	/**
+	 * Retrieves all driver info
+	 */
 	
+	
+	
+	
+	
+	/**
+	 * Delete driver
+	 */
 	
 	
 }
