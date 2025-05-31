@@ -23,9 +23,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.Jacob.ridesafebackend.dto.DriverRequiredInformationDTO;
 import com.Jacob.ridesafebackend.dto.DriverStatusCoordinatesRequest;
 import com.Jacob.ridesafebackend.dto.PassengerStatusCoordiantesRequest;
+import com.Jacob.ridesafebackend.dto.ReviewRequest;
 import com.Jacob.ridesafebackend.models.Driver;
+import com.Jacob.ridesafebackend.models.DriverReview;
 import com.Jacob.ridesafebackend.models.LoginDriver;
 import com.Jacob.ridesafebackend.models.Passenger;
+import com.Jacob.ridesafebackend.service.DriverReviewService;
 import com.Jacob.ridesafebackend.service.DriverService;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import com.Jacob.ridesafebackend.service.PassengerService;
@@ -43,12 +46,14 @@ public class DriverController {
 	private final GoogleAuthentication GoogleAuth;
 	private final PassengerService passengerServ;
 	private final PaymentService paymentServ;
+	private final DriverReviewService reviewService;
 
-	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ,PaymentService paymentServ) {
+	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ,PaymentService paymentServ, DriverReviewService reviewService) {
 		this.driverServ = driverServ;
 		this.GoogleAuth = GoogleAuth;
 		this.passengerServ = passengerServ;
 		this.paymentServ = paymentServ;
+		this.reviewService = reviewService;
 	}
 
 	// ========================= CREATE DRIVER =========================
@@ -100,6 +105,23 @@ public class DriverController {
 
 		return ResponseEntity.ok(driver.get());
 	}
+	
+	// ========================= DRIVER RATING =======================
+	
+	/**
+	 * Reviews for the Driver
+	 */
+	@PutMapping("/send/Review")
+    public ResponseEntity<String> addReview(@RequestBody ReviewRequest reviewRequest) {
+        if (reviewRequest.getStars() < 1 || reviewRequest.getStars() > 5) {
+            return ResponseEntity.badRequest().body("Stars must be between 1 and 5");
+        }
+
+        DriverReview review = new DriverReview(reviewRequest.getDriverId(), reviewRequest.getStars());
+        reviewService.saveReview(review);
+
+        return ResponseEntity.ok("Review saved successfully");
+    }
 
 
 	// ========================= DRIVER LOGIN =========================
