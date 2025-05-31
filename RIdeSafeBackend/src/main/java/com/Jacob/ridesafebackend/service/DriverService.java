@@ -46,6 +46,10 @@ public class DriverService {
 	}
 
 	// TODO: Replace this Google API key with one from the real ride share account
+	
+	public Driver save(Driver driver) {
+        return driverRepo.save(driver);
+    }
 
 	/**
 	 * Handles full sign up data for a driver, including saving documents and info updates.
