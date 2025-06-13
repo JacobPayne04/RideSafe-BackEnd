@@ -44,14 +44,22 @@ public class jwtService {
 	            .getBody();
 	}
 	
-	public boolean isTokenValid(String token) {
-		try {
-			extractAllClaims(token);
-			return true;
-		} catch (JwtException | IllegalArgumentException e) {
-			return false;
-		}
-	}
+	public boolean isTokenValid(String token, String expectedUserId, String expectedRole) {
+        try {
+            Claims claims = extractAllClaims(token);
+            String tokenUserId = claims.get("userId", String.class);
+            String tokenRole = claims.get("role", String.class);
+            Date expiration = claims.getExpiration();
+
+            return expectedUserId.equals(tokenUserId)
+                    && expectedRole.equals(tokenRole)
+                    && expiration.after(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+		
+	
 	
 	public String generateToken(Map<String, Object> extraClaims) {
 		return Jwts.builder()
