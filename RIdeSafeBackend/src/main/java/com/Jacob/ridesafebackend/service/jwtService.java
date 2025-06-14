@@ -1,15 +1,15 @@
 package com.Jacob.ridesafebackend.service;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
 import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class jwtService {
@@ -61,13 +61,20 @@ public class jwtService {
 		
 	
 	
+	public String generateToken(String userId, String role) {
+	    Map<String, Object> claims = new HashMap<>();
+	    claims.put("userId", userId);
+	    claims.put("role", role);
+	    return generateToken(claims); // ✅ this uses your working method
+	}
+	
 	public String generateToken(Map<String, Object> extraClaims) {
-		return Jwts.builder()
-				.setClaims(extraClaims)
-				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-				.signWith(getSignKey())
-				.compact();
-	} 
+	    return Jwts.builder()
+	        .setClaims(extraClaims)
+	        .setIssuedAt(new Date(System.currentTimeMillis()))
+	        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hrs
+	        .signWith(getSignKey())
+	        .compact();
+	}
 	
 }
