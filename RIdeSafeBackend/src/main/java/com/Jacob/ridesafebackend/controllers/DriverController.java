@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ import com.Jacob.ridesafebackend.service.DriverService;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import com.Jacob.ridesafebackend.service.PassengerService;
 import com.Jacob.ridesafebackend.service.PaymentService;
+import com.Jacob.ridesafebackend.service.jwtService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 import jakarta.servlet.http.HttpSession;
@@ -46,13 +48,15 @@ public class DriverController {
 	private final PassengerService passengerServ;
 	private final PaymentService paymentServ;
 	private final DriverRatingRepository driverRatingRepo;
+	private final jwtService jwtService;
 
-	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ,PaymentService paymentServ, DriverRatingRepository driverRatingRepo) {
+	public DriverController(DriverService driverServ, GoogleAuthentication GoogleAuth, PassengerService passengerServ,PaymentService paymentServ, DriverRatingRepository driverRatingRepo,jwtService jwtService) {
 		this.driverServ = driverServ;
 		this.GoogleAuth = GoogleAuth;
 		this.passengerServ = passengerServ;
 		this.paymentServ = paymentServ;
 		this.driverRatingRepo = driverRatingRepo;
+		this.jwtService = jwtService;
 	}
 
 	// ========================= CREATE DRIVER =========================
@@ -167,6 +171,7 @@ public class DriverController {
 		if (!BCrypt.checkpw(loginDriver.getPassword(), existingDriver.getPassword())) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Incorrect password"));
 		}
+		
 
 		return ResponseEntity.ok(Map.of("message", "Login successful", "id", existingDriver.getId()));
 	}
@@ -231,6 +236,21 @@ public class DriverController {
 		return ResponseEntity.ok(driver);
 	}
 
+	// ========================= DELETE DRIVER INFO =========================
+
+	/**
+	 * Deletes driver according to driver id.
+	 * 
+	 */
+	@DeleteMapping("/delete/driver/{id}")
+	public ResponseEntity<String> deleteDriver(@PathVariable String id){
+		boolean deleted = driverServ.deleteDriverById(id);
+		if(deleted) {
+			return ResponseEntity.ok("Driver deleted successfully");
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Driver not found");
+		}
+	}
 
 	// ========================= STRIPE ONBOARDING =========================
 
@@ -302,10 +322,13 @@ public class DriverController {
 					session.setAttribute("driverId", driver.getId());
 
 					System.out.println("Driver Exists. ID: " + driver.getId());
-
+					
+					String token = jwtService.generateToken(driver.getId(),"DRIVER");
 					return ResponseEntity.ok(Map.of(
 							"exists", true,
 							"driverId", driver.getId(),
+							"role", "DRIVER",
+							"token", token,
 							"message", "Driver found, proceed to home."));
 				} else {
 					System.out.println("New Driver Detected. Redirecting to Registration.");
@@ -325,10 +348,13 @@ public class DriverController {
 					session.setAttribute("passengerId", passenger.getId());
 
 					System.out.println("Passenger Exists. ID: " + passenger.getId());
-
+					
+					String token = jwtService.generateToken(passenger.getId(), "PASSENGER");
 					return ResponseEntity.ok(Map.of(
 							"exists", true,
 							"passengerId", passenger.getId(),
+							"role", "PASSENGER",
+							"token", token,
 							"message", "Passenger found, proceed to home."));
 				} else {
 					System.out.println("New Passenger Detected. Redirecting to Registration.");

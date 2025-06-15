@@ -1,10 +1,13 @@
 package com.Jacob.ridesafebackend.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.Jacob.ridesafebackend.models.Driver;
@@ -16,7 +19,9 @@ import com.Jacob.ridesafebackend.repositorys.RideRepository;
 @Service
 public class RideService {
 	// Connects server to repository
-	private final RideRepository rideRepo; // #TODO create getters and setters !*
+	
+	private final RideRepository rideRepo; 
+	private final SimpMessagingTemplate messagingTemplate;
 
 	@Value("${google.maps.api.key}")
 	private String apiKey;
@@ -25,8 +30,9 @@ public class RideService {
 
 
 	// driverRepo refers to ride repository
-	public RideService(RideRepository rideRepo) {
+	public RideService(RideRepository rideRepo ,SimpMessagingTemplate messagingTemplate) {
 		this.rideRepo = rideRepo;
+		this.messagingTemplate = messagingTemplate;
 	}
 
 	/**
@@ -50,6 +56,28 @@ public class RideService {
 		Optional<Ride> rideOptional = rideRepo.findById(rideId);
 		return rideOptional.map(Ride::getDriverId);
 	}
+	
+	/**
+	 * Gets the ride id and subscribes the passenger to message for rating system
+	 */
+	public void sendPassengerRatingPrompt(String rideId) {
+	    Optional<Ride> optionalRide = rideRepo.findById(rideId);
+	    if (!optionalRide.isPresent()) {
+	        throw new RuntimeException("Ride not found with ID: " + rideId);
+	    }
+
+	    Ride ride = optionalRide.get();
+	    String passengerId = ride.getPassengerId();
+	    String driverId = ride.getDriverId();
+
+	    Map<String, String> payload = new HashMap<>();
+	    payload.put("type", "RIDE_ENDED");
+	    payload.put("driverId", driverId);
+
+	    messagingTemplate.convertAndSend("/topic/passenger/" + passengerId, payload);
+	}
+	
+	
 
 	/**
 	 * Updates the ride status (e.g., to ONGOING, COMPLETED).

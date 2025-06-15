@@ -85,6 +85,18 @@ public class DriverService {
 
 		driverRepo.save(driver);
 	}
+	
+	/*
+	 * Deletes a single driver by their ID
+	 */
+	public boolean deleteDriverById(String id) {
+		Optional<Driver> optionalDriver = driverRepo.findById(id);
+		if(optionalDriver.isPresent()) {
+			driverRepo.deleteById(id);
+			return true;
+		} 
+		return false;
+	}
 
 
 	/**

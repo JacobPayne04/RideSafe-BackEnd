@@ -103,6 +103,7 @@ public class RideController {
 	public ResponseEntity<Ride> completeRide(@PathVariable String rideId, @RequestParam String driverId) {
 		Ride ride = rideServ.completeRide(rideId,driverId);
 		if (ride != null) {
+			rideServ.sendPassengerRatingPrompt(rideId);
 			return new ResponseEntity<>(ride, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
