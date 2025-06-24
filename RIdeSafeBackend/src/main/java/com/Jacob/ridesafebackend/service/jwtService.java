@@ -10,16 +10,19 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class jwtService {
 
 	
 	
-	private final String SECRETE_KEY = "your-256-bit-secret-key-goes-here-make-it-long";
+	private final String SECRETE_KEY = "aP9s!32@VbQ#87kLmZ*eFgT$1uYxWcBnM";
+
 
 	
 	public Key getSignKey() {
+		byte[] keyBytes = SECRETE_KEY.getBytes(StandardCharsets.UTF_8);
 		return Keys.hmacShaKeyFor(SECRETE_KEY.getBytes());
 	}
 	
