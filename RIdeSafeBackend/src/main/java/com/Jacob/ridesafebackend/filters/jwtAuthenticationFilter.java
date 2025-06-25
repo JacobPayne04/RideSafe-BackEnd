@@ -17,57 +17,65 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class jwtAuthenticationFilter implements Filter {
 
-    private final jwtService jwtService;
-    private final AuthValidationService authValidationService;
+	 private final jwtService jwtService;
+	    private final AuthValidationService authValidationService;
 
-    public jwtAuthenticationFilter(jwtService jwtService, AuthValidationService authValidationService) {
-        this.jwtService = jwtService;
-        this.authValidationService = authValidationService;
-    }
+	    public jwtAuthenticationFilter(jwtService jwtService, AuthValidationService authValidationService) {
+	        this.jwtService = jwtService;
+	        this.authValidationService = authValidationService;
+	    }
 
-    @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
-            throws IOException, ServletException {
+	    @Override
+	    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
+	            throws IOException, ServletException {
 
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
+	        HttpServletRequest request = (HttpServletRequest) servletRequest;
+	        HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String authHeader = request.getHeader("Authorization");
+	        // ✅ CORS Headers
+	        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+	        response.setHeader("Access-Control-Allow-Credentials", "true");
+	        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+	        response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Missing or invalid Authorization header");
-            return;
-        }
+	        // ✅ Skip JWT validation for OPTIONS (CORS preflight)
+	        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+	            response.setStatus(HttpServletResponse.SC_OK);
+	            return;
+	        }
 
-        String token = authHeader.substring(7);
+	        // 🔐 JWT Authentication
+	        String authHeader = request.getHeader("Authorization");
 
-        // 🔥 Extract user info first
-        String userId = jwtService.extractUserId(token);
-        String role = jwtService.extractUserRole(token);
+	        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+	            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	            response.getWriter().write("Missing or invalid Authorization header");
+	            return;
+	        }
 
-        // 🔒 Validate the token's integrity and match claims
-        if (!jwtService.isTokenValid(token, userId, role)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid or expired token");
-            return;
-        }
+	        String token = authHeader.substring(7);
 
-        // ✅ Optionally run deeper validation logic
-        try {
-            authValidationService.validateRequest(token, userId, role);
-        } catch (UnauthorizedException e) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().write("User validation failed: " + e.getMessage());
-            return;
-        }
+	        String userId = jwtService.extractUserId(token);
+	        String role = jwtService.extractUserRole(token);
 
-        // 🎯 Attach user info to request scope
-        request.setAttribute("userId", userId);
-        request.setAttribute("role", role);
+	        if (!jwtService.isTokenValid(token, userId, role)) {
+	            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	            response.getWriter().write("Invalid or expired token");
+	            return;
+	        }
 
-        // 🚀 Pass request onward
-        chain.doFilter(request, response);
-    }
+	        try {
+	            authValidationService.validateRequest(token, userId, role);
+	        } catch (UnauthorizedException e) {
+	            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+	            response.getWriter().write("User validation failed: " + e.getMessage());
+	            return;
+	        }
+
+	        request.setAttribute("userId", userId);
+	        request.setAttribute("role", role);
+
+	        chain.doFilter(request, response);
+	    }
 	
 }

@@ -20,7 +20,6 @@ public class FitlerConfig {
 	            "/edit/driver/*",
 	            "/create-Payment-Intent",
 	            "/refund",
-	            "/rides/save",
 	            "/update-ride-payment"
 	        );
 
