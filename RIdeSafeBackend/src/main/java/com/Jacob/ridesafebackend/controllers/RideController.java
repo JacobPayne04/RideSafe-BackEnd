@@ -121,7 +121,9 @@ public class RideController {
 
 		return ResponseEntity.ok(rides);
 	}
+	
 
+	//needs to change api route to make it better to fit in webcongif#TODO
 	@GetMapping("/{id}/MapRoute")
 	public ResponseEntity<Map<String, String>> getRideMapUrl(@PathVariable String id) {
 		String googleMapsUrl = rideServ.getGoogleMapsUrl(id);
