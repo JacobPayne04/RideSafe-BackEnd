@@ -75,7 +75,7 @@ public class jwtService {
 	    return Jwts.builder()
 	        .setClaims(extraClaims)
 	        .setIssuedAt(new Date(System.currentTimeMillis()))
-	        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hrs
+	        .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 24 hrs
 	        .signWith(getSignKey())
 	        .compact();
 	}
