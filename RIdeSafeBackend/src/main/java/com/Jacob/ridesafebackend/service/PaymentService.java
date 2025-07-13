@@ -66,9 +66,7 @@ public class PaymentService {
 
 	 	PaymentIntent paymentIntent = PaymentIntent.create(params);
 
-	 	System.out.println("PaymentIntent ID: " + paymentIntent.getId());
-	 	System.out.println("Client Secret: " + paymentIntent.getClientSecret());
-
+	 
 	 	Map<String, String> responseData = new HashMap<>();
 	 	responseData.put("clientSecret", paymentIntent.getClientSecret());
 	 	responseData.put("paymentIntentId", paymentIntent.getId());

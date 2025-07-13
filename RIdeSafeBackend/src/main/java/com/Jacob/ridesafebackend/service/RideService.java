@@ -41,7 +41,7 @@ public class RideService {
 	public Ride saveRide(Ride ride) {
 		return rideRepo.save(ride);
 	}
-
+	
 	/**
 	 * Retrieves a ride by its unique ID.
 	 */
@@ -49,6 +49,12 @@ public class RideService {
 		return rideRepo.findById(id);
 	}
 
+	
+	public List<Ride> getOngoingRidesByDriverId(String driverId) {
+		return rideRepo.findByDriverIdAndStatus(driverId, Ride.RideStatus.ONGOING);
+	}
+	
+	
 	/**
 	 * Gets the driverId assigned to a ride.
 	 */
@@ -61,11 +67,13 @@ public class RideService {
 	 * Gets the ride id and subscribes the passenger to message for rating system
 	 */
 	public void sendPassengerRatingPrompt(String rideId) {
+		
 	    Optional<Ride> optionalRide = rideRepo.findById(rideId);
+	    
 	    if (!optionalRide.isPresent()) {
 	        throw new RuntimeException("Ride not found with ID: " + rideId);
 	    }
-
+  
 	    Ride ride = optionalRide.get();
 	    String passengerId = ride.getPassengerId();
 	    String driverId = ride.getDriverId();
@@ -76,6 +84,10 @@ public class RideService {
 
 	    messagingTemplate.convertAndSend("/topic/passenger/" + passengerId, payload);
 	}
+	
+	
+	
+	
 	
 	
 
@@ -89,6 +101,7 @@ public class RideService {
 		ride.setRideStatus(status);
 		rideRepo.save(ride);
 	}
+	
 
 	/**
 	 * Assigns a driver to a ride.
@@ -123,6 +136,11 @@ public class RideService {
 		return null;
 	}
 
+	
+	
+	
+	
+	
 	/**
 	 * Completes the current ride and promotes the next one in queue to ONGOING.
 	 */
@@ -153,13 +171,15 @@ public class RideService {
 
 		return ride;
 	}
+	
+	
+	
+	
+	
 
 	/**
 	 * Retrieves all ongoing rides currently assigned to a driver.
 	 */
-	public List<Ride> getOngoingRidesByDriverId(String driverId) {
-		return rideRepo.findByDriverIdAndStatus(driverId, Ride.RideStatus.ONGOING);
-	}
 
 	/**
 	 * Generates a Google Maps directions URL for a ride.
