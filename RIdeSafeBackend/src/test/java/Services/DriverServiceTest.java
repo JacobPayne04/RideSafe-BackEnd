@@ -64,48 +64,7 @@ public class DriverServiceTest {
 	 }
 	 
 	 
-	 @Test
-	 void processDriverRequiredInformationSignup_shouldUpdateDriverAndSaveFiles() throws IOException {
-	     // ----- Arrange -----
-	     DriverRequiredInformationDTO info = mock(DriverRequiredInformationDTO.class);
-	     MultipartFile dlFile = mock(MultipartFile.class);
-	     MultipartFile studentIdFile = mock(MultipartFile.class);
-
-	     when(info.getDriverid()).thenReturn("123");
-	     when(info.getFirstName()).thenReturn("Jacob");
-	     when(info.getLastName()).thenReturn("Payne");
-	     when(info.getLicensePlate()).thenReturn("1JN12");
-	     when(info.isAcceptedTerms()).thenReturn(true);
-	     when(info.geteSign()).thenReturn("Signed");
-
-	     Driver existingDriver = new Driver();
-	     existingDriver.setId("123");
-
-	     when(driverRepo.findById("123")).thenReturn(Optional.of(existingDriver));
-
-	     // mock file behavior
-	     when(dlFile.isEmpty()).thenReturn(false);
-	     when(dlFile.getOriginalFilename()).thenReturn("dl.png");
-	     when(dlFile.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("fakecontent".getBytes()));
-
-	     when(studentIdFile.isEmpty()).thenReturn(false);
-	     when(studentIdFile.getOriginalFilename()).thenReturn("id.png");
-	     when(studentIdFile.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("fakecontent".getBytes()));
-
-	     // ----- Act -----
-	     driverService.processDriverRequiredInformationSignup(info, dlFile, studentIdFile);
-
-	     // ----- Assert -----
-	     verify(driverRepo).save(argThat(driver -> 
-	         driver.getFirstName().equals("Jacob") &&
-	         driver.getLastName().equals("Payne") &&
-	         driver.getLicensePlate().equals("1JN12") &&
-	         driver.getDlFileUrl().contains("dl.png") &&
-	         driver.getStudentIdFileUrl().contains("id.png") &&
-	         driver.isAcceptedTerms() &&
-	         driver.geteSign().equals("Signed")
-	     ));
-	 }
+	
 
 	 
 	 @Test

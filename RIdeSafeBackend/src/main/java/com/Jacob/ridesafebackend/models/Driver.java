@@ -1,5 +1,8 @@
 package com.Jacob.ridesafebackend.models;
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
@@ -18,6 +21,8 @@ public class Driver {
 	@Id
 	private String id;
 	
+	
+
 	private String googleId;
 	
 	private String stripeAccountId;
@@ -31,7 +36,6 @@ public class Driver {
 	@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
 	private GeoJsonPoint location;
 	
-	
 	private String dlFileUrl;
 	private String studentIdFileUrl;
 	private String eSign;
@@ -41,7 +45,9 @@ public class Driver {
     private int ratingSum;
     private double averageRating;
 	
-	
+
+	@CreatedDate
+	private LocalDateTime createdAt;	
 	
 	@NotEmpty(message = "First name is required!")
 	@Size(min = 3,max = 15,message = "First name must be between 3 and 15 characters")
@@ -68,6 +74,14 @@ public class Driver {
 	@NotEmpty(message = "License plate is required!")
 	@Size(min = 5,max = 9,message = "License plate must be between 3 and 9 characters" )
 	
+	
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 	
 	public String getStripeAccountId() {
 		return stripeAccountId;

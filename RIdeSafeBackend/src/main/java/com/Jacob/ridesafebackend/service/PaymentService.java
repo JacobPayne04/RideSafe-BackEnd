@@ -99,7 +99,7 @@ public class PaymentService {
 	 	driverRepo.save(driver);
 
 	 	AccountLinkCreateParams linkParams = AccountLinkCreateParams.builder()
-	 			.setAccount(driver.getId())
+	 			.setAccount(account.getId())
 	 			.setRefreshUrl("http://localhost:3000/driver/" + driverId + "/verification/account/setup")      // TODO: Update this for production
 	 			.setReturnUrl("http://localhost:3000/driver/" + driverId + "/verification/account/setup?stripe=success")  // TODO: Update this for production
 	 			.setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)

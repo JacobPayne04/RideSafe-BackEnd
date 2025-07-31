@@ -77,19 +77,18 @@ public class DriverController {
 	 * Accepts required information and document uploads to complete driver signup.
 	 */
 	@PostMapping("/Driver/complete/signup")
-	public ResponseEntity<?> SubmitDriverApplication(
-			@RequestPart("info") DriverRequiredInformationDTO info,
-			@RequestPart("dlFile") MultipartFile dlFile,
-			@RequestPart("studentIdFile") MultipartFile studentIdFile) {
+	public ResponseEntity<?> submitDriverApplication(
+	        @RequestPart("info") DriverRequiredInformationDTO info,
+	        @RequestPart("dlFile") MultipartFile dlFile,
+	        @RequestPart("studentIdFile") MultipartFile studentIdFile) {
 
-		try {
-			driverServ.processDriverRequiredInformationSignup(info, dlFile, studentIdFile);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Driver application submitted successfully.");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("signup failed : " + e.getMessage());
-		}
+	    try {
+	        driverServ.processDriverRequiredInformationSignup(info, dlFile, studentIdFile);
+	        return ResponseEntity.ok("Driver application submitted successfully.");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("Signup failed: " + e.getMessage());
+	    }
 	}
 	
 	// ========================= DECLINE DRIVER =============================

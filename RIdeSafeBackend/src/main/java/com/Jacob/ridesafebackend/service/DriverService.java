@@ -1,5 +1,6 @@
 package com.Jacob.ridesafebackend.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,35 +71,32 @@ public class DriverService {
 	 * Handles full sign up data for a driver, including saving documents and info updates.
 	 */
 	public void processDriverRequiredInformationSignup(
-			DriverRequiredInformationDTO info,
-			MultipartFile dlFile,
-			MultipartFile studentIdFile
+	        DriverRequiredInformationDTO info,
+	        MultipartFile dlFile,
+	        MultipartFile studentIdFile
 	) throws IOException {
 
-		String driverId = info.getDriverid();
-		Optional<Driver> optionalDriver = driverRepo.findById(driverId);
+	    String driverId = info.getDriverid();
+	    Optional<Driver> optionalDriver = driverRepo.findById(driverId);
 
-		if (optionalDriver.isEmpty()) {
-			throw new RuntimeException("Driver not found");
-		}
+	    if (optionalDriver.isEmpty()) {
+	        throw new RuntimeException("Driver not found");
+	    }
 
-		Driver driver = optionalDriver.get();
+	    Driver driver = optionalDriver.get();
 
-		// Save file uploads and set paths
-		String dlPath = saveFile(dlFile);
-		String studentIdPath = saveFile(studentIdFile);
+	    // Save file uploads and set paths
+	    String dlPath = saveFile(dlFile);
+	    String studentIdPath = saveFile(studentIdFile);
 
-		driver.setDlFileUrl(dlPath);
-		driver.setStudentIdFileUrl(studentIdPath);
+	    driver.setDlFileUrl(dlPath);
+	    driver.setStudentIdFileUrl(studentIdPath);
 
-		// Update driver profile info
-		driver.setFirstName(info.getFirstName());
-		driver.setLastName(info.getLastName());
-		driver.setLicensePlate(info.getLicensePlate());
-		driver.setAcceptedTerms(info.isAcceptedTerms());
-		driver.seteSign(info.geteSign());
+	    // Only set remaining required signup info
+	    driver.setAcceptedTerms(info.isAcceptedTerms());
+	    driver.seteSign(info.geteSign());
 
-		driverRepo.save(driver);
+	    driverRepo.save(driver);
 	}
 	
 	/*
@@ -277,5 +275,7 @@ public class DriverService {
 
 		return "/" + uploadsDir + fileName;
 	}
+	
 
+	
 }
