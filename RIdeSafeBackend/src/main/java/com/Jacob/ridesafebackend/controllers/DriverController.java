@@ -91,6 +91,21 @@ public class DriverController {
 					.body("signup failed : " + e.getMessage());
 		}
 	}
+	
+	// ========================= DECLINE DRIVER =============================
+	
+	// Allows Admin to Decline the Driver
+	
+	@PutMapping("/decline/driver/{id}")
+	public ResponseEntity<String> declineDriver(@PathVariable String id) {
+	    boolean success = driverServ.declineDriver(id);
+	    if (success) {
+	        return ResponseEntity.ok("Driver declined successfully.");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Driver not found.");
+	    }
+	}
+
 
 
 	// ========================= GET DRIVER BY ID =========================
