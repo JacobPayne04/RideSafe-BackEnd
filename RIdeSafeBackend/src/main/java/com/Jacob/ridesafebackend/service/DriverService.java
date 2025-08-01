@@ -44,6 +44,21 @@ public class DriverService {
 		}
 		return driverRepo.save(driver);
 	}
+	
+
+	/**
+	 * Declines the Driver
+	 */
+	 public boolean declineDriver(String id) {
+    Optional<Driver> driverOpt = driverRepo.findById(id);
+    if (driverOpt.isPresent()) {
+        driverRepo.deleteById(id); // or set a status if you want to keep the record
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 	// TODO: Replace this Google API key with one from the real ride share account
 	
