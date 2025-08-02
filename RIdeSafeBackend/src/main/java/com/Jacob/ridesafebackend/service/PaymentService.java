@@ -96,7 +96,7 @@ public class PaymentService {
 
 	 	Driver driver = optionaldriver.get();
 	 	driver.setStripeAccountId(account.getId());
-	 	driverRepo.save(driver);
+	 	driverRepo.save(driver);   
 
 	 	AccountLinkCreateParams linkParams = AccountLinkCreateParams.builder()
 	 			.setAccount(account.getId())
