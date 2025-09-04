@@ -64,7 +64,7 @@ public class DriverController {
 	/**
 	 * Creates a new driver in the system and returns the created driver object.
 	 */
-	@PostMapping("/new")
+	@PostMapping("/api/v1/drivers/create")
 	public ResponseEntity<Driver> createDriver(@RequestBody Driver driver, HttpSession session) {
 		Driver creatDriver = driverServ.creatDriver(driver);
 		return ResponseEntity.ok(creatDriver);
@@ -76,7 +76,7 @@ public class DriverController {
 	/**
 	 * Accepts required information and document uploads to complete driver signup.
 	 */
-	@PostMapping("/Driver/complete/signup")
+	@PostMapping("/api/v1/drivers/signup/complete")
 	public ResponseEntity<?> submitDriverApplication(
 	        @RequestPart("info") DriverRequiredInformationDTO info,
 	        @RequestPart("dlFile") MultipartFile dlFile,
@@ -95,7 +95,7 @@ public class DriverController {
 	
 	// Allows Admin to Decline the Driver
 	
-	@PutMapping("/decline/driver/{id}")
+	@PutMapping("/api/v1/admin/drivers/{id}/decline")
 	public ResponseEntity<String> declineDriver(@PathVariable String id) {
 	    boolean success = driverServ.declineDriver(id);
 	    if (success) {
@@ -112,7 +112,7 @@ public class DriverController {
 	/**
 	 * Retrieves a driver by their unique ID.
 	 */
-	@GetMapping("/driver/{id}")
+	@GetMapping("/api/v1/driver/{id}")
 	public ResponseEntity<?> getDriverById(@PathVariable("id") String id) {
 		Optional<Driver> driver = driverServ.getDriverById(id);
 
@@ -128,7 +128,7 @@ public class DriverController {
 	/**
 	 * Reviews for the Driver
 	 */
-	@PutMapping("/send/Review")
+	@PutMapping("/api/v1/driver/send/Review")
 	public ResponseEntity<?> rateDriver(@RequestBody Map<String, String> payload) {
 	    String driverId = payload.get("driverId");
 	    String passengerId = payload.get("passengerId");
@@ -174,7 +174,7 @@ public class DriverController {
 	 * Logs in a driver using email and password.
 	 * Verifies credentials using BCrypt.
 	 */
-	@PostMapping("/login")
+	@PostMapping("/api/v1/login")
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginDriver loginDriver, HttpSession session) {
 		Driver existingDriver = driverServ.getDriver(loginDriver.getEmail());
 
@@ -196,7 +196,7 @@ public class DriverController {
 	/**
 	 * Updates driver's availability (online/offline) and their coordinates.
 	 */
-	@PutMapping("/{id}/status")
+	@PutMapping("/api/v1/drivers/{id}/status")
 	public ResponseEntity<String> updateDriverStatus(
 			@PathVariable("id") String id,
 			@RequestBody DriverStatusCoordinatesRequest request) {
@@ -215,7 +215,7 @@ public class DriverController {
 	/**
 	 * Returns a list of all drivers currently marked as online.
 	 */
-	@GetMapping("/online/drivers")
+	@GetMapping("/api/v1/drivers/online")
 	public ResponseEntity<List<Driver>> GetIsOnlineDrivers() {
 		List<Driver> onlineDrivers = driverServ.getIsOnlineDrivers();
 		return ResponseEntity.ok(onlineDrivers);
@@ -227,7 +227,7 @@ public class DriverController {
 	/**
 	 * Finds nearby drivers based on the passenger's coordinates.
 	 */
-	@PostMapping("/nearby/drivers")
+	@PostMapping("/api/v1/geo/drivers/nearby")
 	public ResponseEntity<List<Driver>> getNearbyDrivers(
 			@RequestBody PassengerStatusCoordiantesRequest passengerStatusCoordinatesRequest) {
 
@@ -244,7 +244,7 @@ public class DriverController {
 	/**
 	 * Updates driver profile info with new values.
 	 */
-	@PutMapping("/edit/driver/{id}")
+	@PutMapping("/api/v1/drivers/edit/{id}")
 	public ResponseEntity<Driver> updateDriver(@PathVariable String id, @RequestBody Driver updatedDriver) {
 		Driver driver = driverServ.updateDriver(id, updatedDriver);
 		return ResponseEntity.ok(driver);
@@ -256,7 +256,7 @@ public class DriverController {
 	 * Deletes driver according to driver id.
 	 * 
 	 */
-	@DeleteMapping("/delete/driver/{id}")
+	@DeleteMapping("/api/v1/drivers/{id}/delete")
 	public ResponseEntity<String> deleteDriver(@PathVariable String id){
 		boolean deleted = driverServ.deleteDriverById(id);
 		if(deleted) {
@@ -271,7 +271,7 @@ public class DriverController {
 	/**
 	 * Starts the Stripe Express onboarding process for a driver using their email.
 	 */
-	@PostMapping("/Driver/stripe/signup")
+	@PostMapping("/api/v1/driver/stripe/onboard")
 	public ResponseEntity<String> onboardDriver(@RequestParam String email, @RequestParam String driverId) {
 		try {
 			System.out.println("🔁 Incoming request to onboard email: " + email + " Driver Id: " + driverId);
@@ -295,7 +295,7 @@ public class DriverController {
 	 * Handles Google Sign-In for both drivers and passengers.
 	 * Determines if the user already exists or needs to register.
 	 */
-	@PostMapping("/signup/{role}/googleId")
+	@PostMapping("/api/v1/auth/signup/{role}/googleId/")
 	public ResponseEntity<?> googleSignIn(
 			@PathVariable String role,
 			@RequestBody Map<String, String> requestBody,

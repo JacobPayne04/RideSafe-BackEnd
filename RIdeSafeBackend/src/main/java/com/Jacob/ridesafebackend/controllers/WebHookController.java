@@ -35,7 +35,7 @@ public class WebHookController {
 	     * Handles incoming Stripe web hook events.
 	     * Validates the signature and processes payment-related events like success and failure.
 	     */
-	    @PostMapping("/stripe/paymentStatus")
+	    @PostMapping("/api/v1/webhooks/stripe/payment-status")
 	    public ResponseEntity<String> handleStripeWebhook(
 	    		@RequestBody String payload,
 	    		@RequestHeader("Stripe-Signature") String sigHeader) {

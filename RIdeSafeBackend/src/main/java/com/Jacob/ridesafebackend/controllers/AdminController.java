@@ -25,7 +25,7 @@ public class AdminController {
 	    }
 
 	  		//  Get all drivers who are not allowed to drive
-	  		@GetMapping("/drivers/unapproved")
+	  		@GetMapping("/api/v1/admin/drivers/unapproved")
 	  		public ResponseEntity<List<Driver>> getUapprovedDrivers(){
 	  			
 	  			List<Driver> unapproved = adminServ.getUapprovedDrivers();
@@ -36,20 +36,20 @@ public class AdminController {
 	  		
 	  		
 	  		 //  Approve a driver by ID
-	  		@PutMapping("/approve/driver/{id}")
+	  		@PutMapping("/api/v1/admin/drivers/{id}/approve")
 	  		public ResponseEntity<String> approveDriver(@PathVariable String id){
 	  			String message = adminServ.approveDriver(id);
 	  			return ResponseEntity.ok(message);
 	  		}
 	  		
 	  		
-	  		@GetMapping("/admin/drivers/all")
+	  		@GetMapping("/api/v1/admin/drivers/all")
 	  		public ResponseEntity<List<Driver>> adminGetAllDrivers() {
 	  			List<Driver> driver = adminServ.getAllDrivers();
 				return ResponseEntity.ok(driver);
 	  		}
 	  		
-	  		@GetMapping("/admin/passengers/all")
+	  		@GetMapping("/api/v1/admin/passengers/all")
 	  		public ResponseEntity<List<Passenger>> adminGetAllPassengers(){
 	  			List<Passenger> passenger = adminServ.getAllPassengers();
 	  			return ResponseEntity.ok(passenger);

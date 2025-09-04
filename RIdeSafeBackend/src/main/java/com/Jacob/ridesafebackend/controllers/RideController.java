@@ -42,7 +42,7 @@ public class RideController {
 		this.paymentServ = paymentServ;
 	}
 
-	@PostMapping("/rides/save")
+	@PostMapping("/api/v1/rides/save")
 	public ResponseEntity<Map<String, Object>> saveRide(@RequestBody Ride ride) {
 	    Ride savedRide = rideServ.saveRide(ride);
 
@@ -60,7 +60,7 @@ public class RideController {
 
 
 	// Get ride by Id
-	@GetMapping("/ride/{id}")
+	@GetMapping("/api/v1/rides/{id}")
 	public ResponseEntity<Ride> getRideById(@PathVariable String id) {
 		Optional<Ride> ride = rideServ.getRideById(id);
 		return ride.map(ResponseEntity::ok).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -68,7 +68,7 @@ public class RideController {
 
 	
 
-	@PutMapping("/{id}/accept/complete") // TODO# add ongoing in route, and add IN_QUEUE in enum in ride model TODO#
+	@PutMapping("/api/v1/rides/{id}/accept/complete") // TODO# add ongoing in route, and add IN_QUEUE in enum in ride model TODO#
 											// make
 	// "acceptRide" service method to acceptRideOngoing
 	public ResponseEntity<String> acceptRideComplete(@PathVariable String id) {
@@ -88,7 +88,7 @@ public class RideController {
 		}
 	}
 
-	@PutMapping("/{rideId}/accept/{driverId}")
+	@PutMapping(" /api/v1/rides/{rideId}/accept/{driverId}")
 	public ResponseEntity<Ride> acceptRide(@PathVariable String rideId, @PathVariable String driverId) {
 		Ride ride = rideServ.acceptRide(rideId, driverId);
 		if (ride != null) {
@@ -99,7 +99,7 @@ public class RideController {
 
 	}
 
-	@PutMapping("/{rideId}/complete")
+	@PutMapping("/api/v1/rides/{rideId}/complete")
 	public ResponseEntity<Ride> completeRide(@PathVariable String rideId, @RequestParam String driverId) {
 		Ride ride = rideServ.completeRide(rideId,driverId);
 		if (ride != null) {
@@ -111,7 +111,7 @@ public class RideController {
 	}
 
 	// Get ongoing rides for driver by driver ID
-	@GetMapping("/driver/{id}/rides/ongoing")
+	@GetMapping("/api/v1/drivers/{id}/rides/ongoing")
 	public ResponseEntity<List<Ride>> getOngoingRidesByDriverId(@PathVariable String id) {
 		List<Ride> rides = rideServ.getOngoingRidesByDriverId(id);
 
@@ -124,13 +124,13 @@ public class RideController {
 	
 
 	//needs to change api route to make it better to fit in webcongif#TODO
-	@GetMapping("/{id}/MapRoute")
+	@GetMapping("/api/v1/rides/{id}/MapRoute")
 	public ResponseEntity<Map<String, String>> getRideMapUrl(@PathVariable String id) {
 		String googleMapsUrl = rideServ.getGoogleMapsUrl(id);
 		return ResponseEntity.ok(Map.of("googleMapsUrl", googleMapsUrl));
 	}
 	
-	@PostMapping("/update-ride-payment")
+	@PostMapping("/api/v1/rides/update-ride-payment")
 	public ResponseEntity<?> updateRidePayment(@RequestBody Map<String, String> payload) {
 	    String rideId = payload.get("rideId");
 
@@ -157,7 +157,7 @@ public class RideController {
 
 
 	
-	 @GetMapping("/details/{rideId}")
+	 @GetMapping("/api/v1/rides/details/{rideId}")
     public ResponseEntity<Ride> getRideDetails(@PathVariable String rideId) {
         Optional<Ride> rideOptional = rideServ.getRideById(rideId);
         if (rideOptional.isPresent()) {

@@ -31,7 +31,7 @@ public class PaymentController {
      * Creates a Stripe PaymentIntent for a given ride.
      * Requires a valid rideId in the request body.
      */
-    @PostMapping("/create-Payment-Intent")
+    @PostMapping("/api/v1/create-Payment-Intent")
     public ResponseEntity<?> createPaymentIntent(@RequestBody Map<String, String> request) {
     	try {
     		String rideId = request.get("rideId");
@@ -69,7 +69,7 @@ public class PaymentController {
      * Refunds a payment using its PaymentIntent ID.
      * Requires "paymentIntentId" in the request body.
      */
-    @PostMapping("/refund")
+    @PostMapping("/api/v1/payments/refunds")
     public ResponseEntity<?> refundPayment(@RequestBody Map<String, String> request) {
     	String paymentIntentId = request.get("paymentIntentId");
 

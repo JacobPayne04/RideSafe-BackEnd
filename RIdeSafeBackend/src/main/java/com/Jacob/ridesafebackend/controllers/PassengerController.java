@@ -45,7 +45,7 @@ public class PassengerController {
 	/**
 	 * Creates a new passenger account and returns the saved object.
 	 */
-	@PostMapping("/new/passenger")
+	@PostMapping("/api/v1/passengers/create")
 	public ResponseEntity<Passenger> createPassenger(@RequestBody Passenger passenger, HttpSession session) {
 		Passenger createPassenger = passengerServ.createPassenger(passenger);
 		return ResponseEntity.ok(createPassenger);
@@ -57,7 +57,7 @@ public class PassengerController {
 	/**
 	 * Retrieves a list of all registered passengers.
 	 */
-	@GetMapping("/passenger")
+	@GetMapping("/api/v1/passengers")
 	public ResponseEntity<List<Passenger>> getAllPassenges() {
 		List<Passenger> passenger = passengerServ.getAllPassengers();
 		return ResponseEntity.ok(passenger);
@@ -69,7 +69,7 @@ public class PassengerController {
 	/**
 	 * Retrieves a single passenger by their ID.
 	 */
-	@GetMapping("/passenger/{id}")
+	@GetMapping("/api/v1/passengers/{id}")
 	public ResponseEntity<?> getPassengerById(@PathVariable("id") String id) {
 		Optional<Passenger> passenger = passengerServ.getPassengerById(id);
 
@@ -86,7 +86,7 @@ public class PassengerController {
 	/**
 	 * Logs in a passenger using email and password.
 	 */
-	@PostMapping("/login/passenger")
+	@PostMapping("/api/v1/auth/passenger/login")
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginPassenger loginPassenger, HttpSession session) {
 		// Fetch passenger by email
 		Passenger existingPassenger = passengerServ.getPassenger(loginPassenger.getEmail());
@@ -110,7 +110,7 @@ public class PassengerController {
 	/**
 	 * Updates a passenger's current coordinates (e.g. for nearby driver lookups).
 	 */
-	@PutMapping("/{id}/status/passenger")
+	@PutMapping("/api/v1/passengers/{id}/status")
 	public ResponseEntity<String> updatePassengerStatus(@PathVariable("id") String id, @RequestBody PassengerStatusCoordiantesRequest request) {
 		passengerServ.updatePasengerStatus(id, request.getLongitude(), request.getLatitude());
 
