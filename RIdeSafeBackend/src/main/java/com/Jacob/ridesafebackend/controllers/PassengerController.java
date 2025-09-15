@@ -23,6 +23,7 @@ import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import com.Jacob.ridesafebackend.service.PassengerService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 
@@ -45,9 +46,8 @@ public class PassengerController {
 
 	// ========================= CREATE PASSENGER =========================
 
-	/**
-	 * Creates a new passenger account and returns the saved object.
-	 */
+	 @Operation(summary = "Create passenger",
+             description = "Creates a new passenger account and returns the saved object.")
 	@PostMapping("/api/v1/passengers/create")
 	public ResponseEntity<Passenger> createPassenger(@RequestBody Passenger passenger, HttpSession session) {
 		Passenger createPassenger = passengerServ.createPassenger(passenger);
@@ -56,10 +56,9 @@ public class PassengerController {
 
 
 	// ========================= GET ALL PASSENGERS =========================
-
-	/**
-	 * Retrieves a list of all registered passengers.
-	 */
+	 
+	 @Operation(summary = "Get all passengers",
+             description = "Retrieves a list of all registered passengers.")
 	@GetMapping("/api/v1/passengers")
 	public ResponseEntity<List<Passenger>> getAllPassenges() {
 		List<Passenger> passenger = passengerServ.getAllPassengers();
@@ -69,9 +68,8 @@ public class PassengerController {
 
 	// ========================= GET PASSENGER BY ID =========================
 
-	/**
-	 * Retrieves a single passenger by their ID.
-	 */
+	 @Operation(summary = "Get passenger by ID",
+             description = "Retrieves a single passenger using their unique ID.")
 	@GetMapping("/api/v1/passengers/{id}")
 	public ResponseEntity<?> getPassengerById(@PathVariable("id") String id) {
 		Optional<Passenger> passenger = passengerServ.getPassengerById(id);
@@ -86,9 +84,8 @@ public class PassengerController {
 
 	// ========================= PASSENGER LOGIN =========================
 
-	/**
-	 * Logs in a passenger using email and password.
-	 */
+	    @Operation(summary = "Passenger login",
+	               description = "Logs in a passenger using email and password. Verifies credentials with BCrypt.")
 	@PostMapping("/api/v1/auth/passenger/login")
 	public ResponseEntity<Map<String, String>> login(@RequestBody LoginPassenger loginPassenger, HttpSession session) {
 		// Fetch passenger by email
@@ -110,9 +107,8 @@ public class PassengerController {
 
 	// ========================= UPDATE PASSENGER COORDINATES =========================
 
-	/**
-	 * Updates a passenger's current coordinates (e.g. for nearby driver lookups).
-	 */
+	    @Operation(summary = "Update passenger status",
+	               description = "Updates a passenger's availability and coordinates for driver lookups.")
 	@PutMapping("/api/v1/passengers/{id}/status")
 	public ResponseEntity<String> updatePassengerStatus(@PathVariable("id") String id, @RequestBody PassengerStatusCoordiantesRequest request) {
 		passengerServ.updatePasengerStatus(id, request.getLongitude(), request.getLatitude());
