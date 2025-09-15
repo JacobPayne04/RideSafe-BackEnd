@@ -18,6 +18,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Refund;
 import com.stripe.param.RefundCreateParams;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -32,10 +33,9 @@ public class PaymentController {
     @Autowired
     private RideRepository rideRepo;  // Inject RideRepository
 
-    /**
-     * Creates a Stripe PaymentIntent for a given ride.
-     * Requires a valid rideId in the request body.
-     */
+    // ========================= CREATE PAYMENT INTENT =========================
+    	    @Operation(summary = "Create Payment Intent",
+    	               description = "Creates a Stripe PaymentIntent for a given ride. Requires a valid rideId in the request body.")
     @PostMapping("/api/v1/create-Payment-Intent")
     public ResponseEntity<?> createPaymentIntent(@RequestBody Map<String, String> request) {
     	try {
@@ -70,10 +70,9 @@ public class PaymentController {
     }
 
 
-    /**
-     * Refunds a payment using its PaymentIntent ID.
-     * Requires "paymentIntentId" in the request body.
-     */
+    	 // ========================= REFUND PAYMENT =========================
+    	    @Operation(summary = "Refund Payment",
+    	               description = "Refunds a payment using its PaymentIntent ID. Requires `paymentIntentId` in the request body.")
     @PostMapping("/api/v1/payments/refunds")
     public ResponseEntity<?> refundPayment(@RequestBody Map<String, String> request) {
     	String paymentIntentId = request.get("paymentIntentId");
