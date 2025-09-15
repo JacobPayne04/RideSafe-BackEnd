@@ -1,22 +1,25 @@
 package com.Jacob.ridesafebackend.controllers;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.service.PaymentService;
-
-import org.springframework.beans.factory.annotation.Value;
-
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
+@RequestMapping("/api/v1/webhooks")
+@Tag(name = "Webhooks", description = "Webhook event handling APIs (e.g., Stripe, notifications)")
 public class WebHookController {
 	
 		private final PaymentService paymentService;

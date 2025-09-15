@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Jacob.ridesafebackend.dto.PassengerStatusCoordiantesRequest;
@@ -23,11 +23,14 @@ import com.Jacob.ridesafebackend.models.Passenger;
 import com.Jacob.ridesafebackend.service.GoogleAuthentication;
 import com.Jacob.ridesafebackend.service.PassengerService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 
 //*FOR PASSENGER PROCESS ROUTES*
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController // Changed from Controller to RestController
+@RequestMapping("/api/v1/passengers")
+@Tag(name = "Passengers", description = "Passenger management APIs")
 public class PassengerController {
 	// TODO need to make passenger service
 	@Autowired
