@@ -24,6 +24,7 @@ import com.Jacob.ridesafebackend.repositorys.RideRepository;
 import com.Jacob.ridesafebackend.service.PaymentService;
 import com.Jacob.ridesafebackend.service.RideService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -47,6 +48,9 @@ public class RideController {
 		this.paymentServ = paymentServ;
 	}
 
+	// ========================= SAVE RIDE =========================
+    @Operation(summary = "Schedule a new ride",
+               description = "Creates and saves a new ride. Returns ride ID, passenger amount, and success message.")
 	@PostMapping("/api/v1/rides/save")
 	public ResponseEntity<Map<String, Object>> saveRide(@RequestBody Ride ride) {
 	    Ride savedRide = rideServ.saveRide(ride);
@@ -64,7 +68,9 @@ public class RideController {
 
 
 
-	// Get ride by Id
+    // ========================= GET RIDE BY ID =========================
+    @Operation(summary = "Get ride by ID",
+               description = "Retrieves ride details by ride ID.")
 	@GetMapping("/api/v1/rides/{id}")
 	public ResponseEntity<Ride> getRideById(@PathVariable String id) {
 		Optional<Ride> ride = rideServ.getRideById(id);
@@ -72,7 +78,9 @@ public class RideController {
 	}
 
 	
-
+    // ========================= ACCEPT RIDE & MARK COMPLETE =========================
+    @Operation(summary = "Accept ride and complete",
+               description = "Updates ride status to COMPLETED for a given ride ID.")
 	@PutMapping("/api/v1/rides/{id}/accept/complete") // TODO# add ongoing in route, and add IN_QUEUE in enum in ride model TODO#
 											// make
 	// "acceptRide" service method to acceptRideOngoing
@@ -93,6 +101,9 @@ public class RideController {
 		}
 	}
 
+    // ========================= ACCEPT RIDE =========================
+    @Operation(summary = "Accept ride",
+               description = "Assigns a driver to a ride using ride ID and driver ID.")
 	@PutMapping(" /api/v1/rides/{rideId}/accept/{driverId}")
 	public ResponseEntity<Ride> acceptRide(@PathVariable String rideId, @PathVariable String driverId) {
 		Ride ride = rideServ.acceptRide(rideId, driverId);
@@ -104,6 +115,10 @@ public class RideController {
 
 	}
 
+
+    // ========================= COMPLETE RIDE =========================
+    @Operation(summary = "Complete ride",
+               description = "Marks a ride as completed by driver ID and sends passenger rating prompt.")
 	@PutMapping("/api/v1/rides/{rideId}/complete")
 	public ResponseEntity<Ride> completeRide(@PathVariable String rideId, @RequestParam String driverId) {
 		Ride ride = rideServ.completeRide(rideId,driverId);
@@ -115,7 +130,9 @@ public class RideController {
 		}
 	}
 
-	// Get ongoing rides for driver by driver ID
+    // ========================= ONGOING RIDES =========================
+    @Operation(summary = "Get ongoing rides by driver ID",
+               description = "Retrieves all rides currently marked as ongoing for a given driver ID.")
 	@GetMapping("/api/v1/drivers/{id}/rides/ongoing")
 	public ResponseEntity<List<Ride>> getOngoingRidesByDriverId(@PathVariable String id) {
 		List<Ride> rides = rideServ.getOngoingRidesByDriverId(id);
@@ -127,7 +144,9 @@ public class RideController {
 		return ResponseEntity.ok(rides);
 	}
 	
-
+    // ========================= GET RIDE MAP URL =========================
+    @Operation(summary = "Get Google Maps route URL",
+               description = "Returns a Google Maps route URL for a given ride ID.")
 	//needs to change api route to make it better to fit in webcongif#TODO
 	@GetMapping("/api/v1/rides/{id}/MapRoute")
 	public ResponseEntity<Map<String, String>> getRideMapUrl(@PathVariable String id) {
@@ -135,6 +154,10 @@ public class RideController {
 		return ResponseEntity.ok(Map.of("googleMapsUrl", googleMapsUrl));
 	}
 	
+
+    // ========================= UPDATE RIDE PAYMENT =========================
+    @Operation(summary = "Update ride payment",
+               description = "Updates the ride payment amount for a given ride ID. Returns ride ID and driver ID.")
 	@PostMapping("/api/v1/rides/update-ride-payment")
 	public ResponseEntity<?> updateRidePayment(@RequestBody Map<String, String> payload) {
 	    String rideId = payload.get("rideId");
@@ -161,7 +184,9 @@ public class RideController {
 	}
 
 
-	
+ // ========================= GET RIDE DETAILS =========================
+    @Operation(summary = "Get ride details",
+               description = "Retrieves detailed ride information by ride ID.")
 	 @GetMapping("/api/v1/rides/details/{rideId}")
     public ResponseEntity<Ride> getRideDetails(@PathVariable String rideId) {
         Optional<Ride> rideOptional = rideServ.getRideById(rideId);
