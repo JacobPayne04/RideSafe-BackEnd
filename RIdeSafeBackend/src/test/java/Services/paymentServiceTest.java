@@ -58,7 +58,7 @@ public class paymentServiceTest {
 	@InjectMocks
 	private DriverService driverServ;
 	
-	@InjectMocks
+	@Mock
 	private RideService rideServ;
 	
 	@InjectMocks
@@ -71,6 +71,7 @@ public class paymentServiceTest {
 	    // Arrange
 	    Ride ride = new Ride();
 	    ride.setRate(2); // $2
+	    
 	    long expectedAmountInCents = 200;
 
 	    // Mock the PaymentIntent that Stripe would return

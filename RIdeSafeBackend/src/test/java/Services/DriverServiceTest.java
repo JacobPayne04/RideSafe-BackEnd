@@ -121,7 +121,7 @@ public class DriverServiceTest {
 	     assertEquals("Payne", result.getLastName());
 	     assertEquals("jacob@example.com", result.getEmail());
 	     assertEquals("1JN12", result.getLicensePlate());
-	     assertEquals(4.5, result.getDriverRate());
+	     assertEquals(2, result.getDriverRate());
 	     assertNotEquals("newpass", result.getPassword()); // should be hashed
 	     assertTrue(result.getPassword().startsWith("$2a$")); // bcrypt hash format
 

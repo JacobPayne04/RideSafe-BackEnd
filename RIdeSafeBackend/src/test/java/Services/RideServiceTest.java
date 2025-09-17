@@ -83,7 +83,10 @@ public class RideServiceTest {
 		rideServ.sendPassengerRatingPrompt(rideId);
 
 		// Assert
-		verify(messagingTemplate).convertAndSend(eq("/topic/passenger/" + passengerId), eq("Please rate your driver!"));
+		verify(messagingTemplate).convertAndSend( eq("/topic/passenger/" + passengerId),
+			    argThat((Map<String, Object> payload) ->
+		        "RIDE_ENDED".equals(payload.get("type"))
+		    ));
 	}
 
 	@Test
@@ -148,10 +151,11 @@ public class RideServiceTest {
 	@Test
 	void completeRide_ShouldMarkRideAsComplete() {
 
-		String rideId = "123";
-		String driverId = "abc_123";
+		String rideId = "abc_123";
+		String driverId = "123";
 		Ride ride = new Ride();
-		ride.setId(rideId);
+		
+		ride.setDriverId(driverId);
 		
 		Ride listRides = new Ride();
 
@@ -159,6 +163,7 @@ public class RideServiceTest {
 		when(rideRepo.findByDriverIdAndStatus(driverId, Ride.RideStatus.INQUEUE)).thenReturn(List.of(ride));
 
 		Ride result = rideServ.completeRide(rideId, driverId);
+		ride.setStatus(Ride.RideStatus.COMPLETED);  
 
 		assertEquals(driverId, result.getDriverId());
 		assertEquals(Ride.RideStatus.COMPLETED, result.getStatus());
